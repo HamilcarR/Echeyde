@@ -1,2 +1,2 @@
 # Echeyde
-Sahara remade from scratch,using C++14.
+Sahara engine remake from scratch,using C++14
