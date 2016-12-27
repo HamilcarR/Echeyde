@@ -1,32 +1,39 @@
 #include "Mesh.h"
 
 
-
-Mesh::Mesh(vertex_data &dat , Material &mat , bool isdisplayed)
-{
+Mesh::Mesh() {
 	draw_mode = GL_STATIC_DRAW;
-	for (int v : dat.indices)
-		data.indices.push_back(v); 
-	for (float v : dat.vertex) 
-		data.vertex.push_back(v); 
-	for (float v : dat.color)
-		data.color.push_back(v);
-	for (float v : dat.normal)
-		data.normal.push_back(v);
-	for (float v : dat.texture)
-		data.texture.push_back(v);
-	for (float v : dat.tangent)
-		data.tangent.push_back(v);
-	GLuint program = mat.getProgram();
+	 
+	displayed = false;
+
+}
+
+
+
+Mesh::Mesh(geometry_data &data_arg , std::shared_ptr<Material> &mat , bool isdisplayed)
+{
+	data = data_arg;
+	draw_mode = GL_STATIC_DRAW;
+	if (mat->isTextured())
+		textured_model = true;
+	else
+		textured_model = false;
 	material = mat; 
 	displayed = isdisplayed;
-	initVAO();
-	Bind(); 
+	initVAO(); 
+	Bind();
+	uniforms.projection = glGetUniformLocation(material->getProgram(), M_PROJECTION.c_str());
+	uniforms.model = glGetUniformLocation(material->getProgram(), M_MODEL.c_str());
+	uniforms.view = glGetUniformLocation(material->getProgram(), M_VIEW.c_str());
 }
 
 
 Mesh::~Mesh()
 {
+	
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(vbo_size, vbo);
+	
 }
 
 
@@ -37,60 +44,70 @@ void Mesh::initVAO() {
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(vbo_size, vbo);
 
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::VERTEX]);
+	glBufferData(GL_ARRAY_BUFFER, data.vertex.size() * sizeof(GLfloat), data.vertex.data(), draw_mode);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::VERTEX]); 
-	glBufferData(GL_ARRAY_BUFFER, data.vertex.size() * sizeof(GL_FLOAT), data.vertex.data(), draw_mode );
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::COLOR]);
-	glBufferData(GL_ARRAY_BUFFER, data.color.size() * sizeof(GL_FLOAT), data.color.data(), draw_mode);
+	glBufferData(GL_ARRAY_BUFFER, data.color.size() * sizeof(GLfloat), data.color.data(), draw_mode);
 
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::NORMAL]);
-	glBufferData(GL_ARRAY_BUFFER, data.normal.size() * sizeof(GL_FLOAT), data.normal.data(), draw_mode);
+	glBufferData(GL_ARRAY_BUFFER, data.normal.size() * sizeof(GLfloat), data.normal.data(), draw_mode);
+
 
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::TANGENT]);
-	glBufferData(GL_ARRAY_BUFFER, data.tangent.size() * sizeof(GL_FLOAT), data.tangent.data(), draw_mode);
+	glBufferData(GL_ARRAY_BUFFER, data.tangent.size() * sizeof(GLfloat), data.tangent.data(), draw_mode);
+
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::BITANGENT]);
+	glBufferData(GL_ARRAY_BUFFER, data.bitangent.size() * sizeof(GLfloat), data.bitangent.data(), draw_mode);
+
 
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::TEXTURE]);
-	glBufferData(GL_ARRAY_BUFFER, data.texture.size() * sizeof(GL_FLOAT), data.texture.data(), draw_mode);
+	glBufferData(GL_ARRAY_BUFFER, data.texture.size() * sizeof(GLfloat), data.texture.data(), draw_mode);
+
 
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[Echeyde::INDICE]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.indices.size() * sizeof(GL_UNSIGNED_SHORT), data.indices.data(), draw_mode);
-	
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.indices.size() * sizeof(GLushort), data.indices.data(), draw_mode);
 }
 
 
 
 void Mesh::Bind()
 {
-	glBindVertexArray(vao); 
+	glBindVertexArray(vao);	
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::VERTEX]); 
-	glVertexAttribPointer(Echeyde::VERTEX, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::VERTEX]);
+	glVertexAttribPointer(Echeyde::VERTEX, 3, GL_FLOAT, GL_FALSE, 0, 0);	
 	glEnableVertexAttribArray(Echeyde::VERTEX);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::COLOR]);
-	glVertexAttribPointer(Echeyde::COLOR, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(Echeyde::COLOR, 3, GL_FLOAT, GL_FALSE, 0, 0);	
 	glEnableVertexAttribArray(Echeyde::COLOR);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::NORMAL]);
-	glVertexAttribPointer(Echeyde::NORMAL, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(Echeyde::NORMAL, 3, GL_FLOAT, GL_FALSE, 0, 0);	
 	glEnableVertexAttribArray(Echeyde::NORMAL);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::TANGENT]);
-	glVertexAttribPointer(Echeyde::TANGENT, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	glVertexAttribPointer(Echeyde::TANGENT, 3, GL_FLOAT, GL_FALSE, 0, 0);	
 	glEnableVertexAttribArray(Echeyde::TANGENT);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::TEXTURE]);
-	glVertexAttribPointer(Echeyde::TEXTURE, 3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(Echeyde::TEXTURE);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::BITANGENT]);
+	glVertexAttribPointer(Echeyde::BITANGENT, 3, GL_FLOAT, GL_FALSE, 0, 0);	
+	glEnableVertexAttribArray(Echeyde::BITANGENT);
 
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[Echeyde::TEXTURE]);
+	glVertexAttribPointer(Echeyde::TEXTURE, 2, GL_FLOAT, GL_FALSE, 0, 0);
+	glEnableVertexAttribArray(Echeyde::TEXTURE);
+	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[Echeyde::INDICE]); 
 
-	glBindVertexArray(0); 
+	glBindVertexArray(0);
 
 }
 
@@ -98,7 +115,9 @@ void Mesh::Bind()
 
 
 void Mesh::Unbind() {
+	
 	glDisableVertexAttribArray(Echeyde::TEXTURE); 
+	glDisableVertexAttribArray(Echeyde::BITANGENT);
 	glDisableVertexAttribArray(Echeyde::TANGENT);
 	glDisableVertexAttribArray(Echeyde::NORMAL);
 	glDisableVertexAttribArray(Echeyde::COLOR);
@@ -111,20 +130,23 @@ void Mesh::Unbind() {
 void Mesh::display(glm::mat4 &projection, glm::mat4 &model, glm::mat4 &view) {
 
 	if (displayed) {
-		material.Bind(); 
-		glUniformMatrix4fv(glGetUniformLocation(material.getProgram(), M_PROJECTION.c_str()), 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(glGetUniformLocation(material.getProgram(), M_VIEW.c_str()), 1, GL_FALSE, glm::value_ptr(view));
-		glUniformMatrix4fv(glGetUniformLocation(material.getProgram(), M_MODEL.c_str()), 1, GL_FALSE, glm::value_ptr(model));
+		material->Bind();
+		Bind();
 
-		glBindVertexArray(vao); 
+		glBindVertexArray(vao);
+		{
+			glUniformMatrix4fv(uniforms.projection, 1, GL_FALSE, glm::value_ptr(projection));
+			glUniformMatrix4fv(uniforms.view, 1, GL_FALSE, glm::value_ptr(view));
+			glUniformMatrix4fv(uniforms.model, 1, GL_FALSE, glm::value_ptr(model));
 
-		glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_SHORT, 0);
-
-		glBindVertexArray(0); 
-
+			glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_SHORT, 0);
+		}
+		glBindVertexArray(vao);
 		Unbind();
+
 		
-		material.Unbind(); 
+		
+		material->Unbind(); 
 
 	}
 }

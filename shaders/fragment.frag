@@ -2,6 +2,14 @@
 
 
 in vec3 Icolor;
+in vec2 Itex;
+
+
+
+uniform sampler2D diffuse;
+uniform sampler2D normal;
+
+
 
 
 out vec4 color; 
@@ -10,6 +18,6 @@ out vec4 color;
 
 
 void main(){
-	color = vec4(Icolor,1.);
+	color = texture2D(diffuse,Itex);
 
 }

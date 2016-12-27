@@ -1,6 +1,25 @@
 #include "Window.h"
 #include "Importer.h"
+class PrepareMeshes {
+public :
+	PrepareMeshes(std::vector<object_data> &list_mesh ,Shader& s,bool displayed) {
+		
+		for (object_data i : list_mesh) {
+			std::shared_ptr<Material> material = std::shared_ptr<Material>(new Material(s, i.material));
+			meshes.push_back(std::shared_ptr<Mesh>(new Mesh(i.data,material, displayed)));
+		}
+	}
+	~PrepareMeshes() {
+		meshes.clear();
+	}
+	void display(glm::mat4& projection , glm::mat4& model , glm::mat4 view) {
+		for_each(meshes.begin(), meshes.end(), [&](std::shared_ptr<Mesh> M) {M->display(projection, model, view); });
+	 }
 
+private :
+	std::vector<std::shared_ptr<Mesh>> meshes;
+
+};
 
 Window::Window(const std::string name , Uint16 width , Uint16 height,KInputs &inputs , Echeyde::Scene &sc)
 {
@@ -30,6 +49,7 @@ Window::Window(const std::string name , Uint16 width , Uint16 height,KInputs &in
 	loop = true;
 	scene = &sc;
 	glEnable(GL_DEPTH_TEST);
+
 }
 
 Window::~Window()
@@ -47,10 +67,10 @@ Dim Window::getDimensions() {
 
 void Window::Loop() {
 	Shader shader(std::string("vertex.vert"), std::string("fragment.frag") , std::string("geometry.geom"));
-	object_data st;
+	std::vector<object_data> st;
 	
 	try {
-		st = Echeyde::FILEIO::Importer::load_OBJ(std::string("cube"));
+		st = Echeyde::FILEIO::Importer::load_model(std::string("cube.obj"));
 	}
 	catch (const File_not_found &e) {
 		std::cout << e.what() << std::endl;
@@ -58,25 +78,26 @@ void Window::Loop() {
 	catch (const MaterialException &e) {
 		std::cout << e.what() << std::endl;
 	}
+	catch (const Importer_Error &e) {
+		std::cout << e.what() << std::endl;
+	}
 	
-	Material material(shader);
 	
-	vertex_data data;
-	data.vertex = cube; 
-	data.color = color; 
-	data.indices = indice;
-	Mesh mesh(data, material,true); 
-	glm::mat4 projection = glm::perspective(70.f, 0.5f, 0.001f, 1000.f); 
-	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, -10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)); 
+	
+	glm::mat4 projection = glm::perspective(75.f, float(HEIGHT/WIDTH), 0.001f, 1000.f); 
+	glm::mat4 view = glm::lookAt(glm::vec3(10, 0, -10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)); 
 	glm::mat4 model = glm::mat4(1.); 
+	PrepareMeshes display_meshes(st,shader, true);
+	
+
 	while (loop) {
 		loop = input->Loop();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		mesh.display(projection,model,view); 
 		
-
-
+		display_meshes.display(projection, model, view);
+	
 		SDL_GL_SwapWindow(window); 
+		SDL_Delay(10);
 	}
 
 

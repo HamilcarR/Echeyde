@@ -2,24 +2,33 @@
 #include "View.h"
 #include "Material.h"
 
+
 class Mesh
 {
+
+	struct uniform_matrix {
+		int projection;
+		int view;
+		int model;
+	};
+
 public:
-	Mesh(vertex_data &data , Material &material,bool isdisplayed);
+	Mesh();
+	Mesh(geometry_data &data , std::shared_ptr<Material> &material,bool isdisplayed);
 	virtual ~Mesh();
 	void display(glm::mat4 &projection_matrix, glm::mat4 &model_matrix, glm::mat4 &view); 
 	
-	bool isTransparent() { return transparency; }
+	bool isTransparent() { return material->isTransparent(); }
 	bool isDisplayed() { return displayed; }
    
 	
 protected:
 	
-	bool transparency; 
+	bool textured_model;
 	bool displayed;
-	vertex_data data; 
-	Material material; 
-	uniform_struct uniforms;
+	geometry_data data; 
+	std::shared_ptr<Material> material; 
+	uniform_matrix uniforms;
 	GLuint vao; 
 	GLuint vbo[vbo_size];
 	Uint16 draw_mode;

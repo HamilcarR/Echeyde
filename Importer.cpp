@@ -1,95 +1,147 @@
 #include "Importer.h"
+#include <assimp\scene.h>
+#include <assimp\Importer.hpp>
+#include <assimp\postprocess.h>
+const int UV_CHANNEL = 0x0;
 
 namespace Echeyde {
+
 	namespace FILEIO {
-		 vertex_data Importer::get_data_vertices(std::fstream *obj) {
-			vertex_data data;
-			
 
 
 
-
-			obj->close();
-			return data;
-
-		}
-
-		 material_data Importer::get_data_materials(std::fstream *mtl) {
-			material_data data;
-
-
-
-			mtl->close();
-			return data;
-		 }
-
-		 std::string Importer::get_material_name(std::fstream &obj) {
-			 std::string buf;
-			 while (std::getline(obj, buf)) {
-				 char* tok = strtok(((char*)buf.c_str()), " ");
-				 while (tok != NULL) {
-					 if (std::string(tok).compare("mtllib") == 0) {
-						 tok = strtok(NULL, " ");
-						 if (tok != NULL) {
-							 obj.close();
-							 return std::string(tok);
-						 }
-					}
-					 tok = strtok(NULL, " ");
-				 }
-			 }
-			 obj.close(); 
-			 throw  MaterialException() ;
-			 return std::string(); 
-		}
-
-
-
-		 object_data Importer::load_OBJ(std::string filename) {
-			object_data data;
-			std::fstream obj;
-			std::fstream mtl;
-			std::string file = filename+".obj";
-			std::string mat_name = RESSOURCES_LOCATION;
-			file = RESSOURCES_LOCATION + file;
-			obj.open(file.c_str(), std::ios::in);
-
-			if (!obj.is_open()) {
-				throw File_not_found(file);
-				return data;
+		static std::string load_texture(aiTextureType tex , unsigned int index,const aiMaterial* material) {
+			aiString path;
+			aiReturn status = material->GetTexture(tex, index, &path, 0, 0, 0, 0, 0);
+			if (status == AI_SUCCESS)
+			{
+				std::string full_path = RESSOURCES_LOCATION + path.data;
+				return full_path;
 			}
-			mat_name += get_material_name(obj); 
-			obj.open(file.c_str(),std::ios::in);
-			mtl.open(mat_name.c_str(), std::ios::in);
-			if (!mtl.is_open()) {
-				throw File_not_found(mat_name);
+			else
+				std::cout << "problem loading texture : " << path.data << std::endl;
+			return "";
+		}
+
+/**********************************************************************************************************************************************/
+
+		static textures_data get_texture_data(const aiMaterial* material , const aiScene* scene,unsigned int mesh_index) {
+			textures_data tex_data;
+			for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); i++) {
+					std::string	path = load_texture(aiTextureType_DIFFUSE, i, material);
+					tex_data.diffuse.push_back(path);
+
+			}
+			for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_HEIGHT); i++) {
+				
+					std::string	path = load_texture(aiTextureType_HEIGHT, i, material);
+					tex_data.normal.push_back(path);
+				
+			}
+			for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_OPACITY); i++) {
+			
+				
+					std::string	path = load_texture(aiTextureType_OPACITY, i, material);
+					tex_data.opacity.push_back(path);
+				
+			}
+			for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_UNKNOWN); i++) {
+				
+				
+					std::string	path = load_texture(aiTextureType_UNKNOWN, i, material);
+					tex_data.optional.push_back(path);
+				
+			}
+			return tex_data;
+		}
+
+
+/**********************************************************************************************************************************************/
+
+		static object_data get_mesh_geometry(const aiScene* scene,unsigned int mesh_index) {
+			object_data mesh;
+			aiVector3t<float>* vert = (scene->mMeshes[mesh_index])->mVertices;
+			aiVector3t<float>* normales = (scene->mMeshes[mesh_index])->mNormals;
+			aiVector3t<float>* tangents = (scene->mMeshes[mesh_index])->mTangents;
+			aiVector3t<float>* bitangents = (scene->mMeshes[mesh_index])->mBitangents;
+			aiVector3t<float>* textures = (scene->mMeshes[mesh_index])->mTextureCoords[UV_CHANNEL];
+			aiFace *index = (scene->mMeshes[mesh_index])->mFaces;
+
+			for (unsigned int i = 0; i < scene->mMeshes[mesh_index]->mNumVertices; i++) {
+				mesh.data.vertex.push_back(vert[i].x);
+				mesh.data.vertex.push_back(vert[i].y);
+				mesh.data.vertex.push_back(vert[i].z);
+				mesh.data.color.push_back(vert[i].x);
+				mesh.data.color.push_back(vert[i].y);
+				mesh.data.color.push_back(vert[i].z);
+				mesh.data.normal.push_back(normales[i].x);
+				mesh.data.normal.push_back(normales[i].y);
+				mesh.data.normal.push_back(normales[i].z);
+				mesh.data.tangent.push_back(tangents[i].x);
+				mesh.data.tangent.push_back(tangents[i].y);
+				mesh.data.tangent.push_back(tangents[i].z);
+				mesh.data.bitangent.push_back(bitangents[i].x);
+				mesh.data.bitangent.push_back(bitangents[i].y);
+				mesh.data.bitangent.push_back(bitangents[i].z);
+				mesh.data.texture.push_back(textures[i].x);
+				mesh.data.texture.push_back(textures[i].y);
+			}
+			for (unsigned int i = 0; i < scene->mMeshes[mesh_index]->mNumFaces; i++) {
+				mesh.data.indices.push_back(static_cast<unsigned short>(index[i].mIndices[0]));
+				mesh.data.indices.push_back(static_cast<unsigned short>(index[i].mIndices[1]));
+				mesh.data.indices.push_back(static_cast<unsigned short>(index[i].mIndices[2]));
+			}
+			return mesh;
+		}
+
+
+/**********************************************************************************************************************************************/
+	
+		
+		
+		
+		static material_data get_material_data(const aiMaterial *material,const aiScene* scene, unsigned int mesh_index) {
+			material_data material_dat; 
+			textures_data tex_data = get_texture_data(material, scene, mesh_index);
+			material_dat.textures = tex_data;
+			float shine=1 , strength = 1;
+			material->Get(AI_MATKEY_SHININESS_STRENGTH, strength);
+			material->Get(AI_MATKEY_SHININESS, shine);
+			shine = shine / 4; 
+			material_dat.specular_exponent = shine;
+			material_dat.specular_strength = strength; 
+			return material_dat; 
+		}
+
+		
+		
+		
+		
+/**********************************************************************************************************************************************/
+
+		std::vector<object_data> Importer::load_model(std::string& filename) {
+			std::vector<object_data> data;
+			Assimp::Importer importer;
+			const aiScene *scene = importer.ReadFile(RESSOURCES_LOCATION+filename, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_JoinIdenticalVertices);
+			if (scene == nullptr) {
+				throw Importer_Error(importer,filename);
 				return data; 
 			}
-			auto t_obj = std::async(std::launch::async, get_data_vertices, &obj); 
-			auto t_mtl = std::async(std::launch::async, get_data_materials, &mtl); 
+			const aiMaterial* material;
+			unsigned int mesh_number = scene->mNumMeshes; 
+			for (size_t mesh_index = 0; mesh_index < mesh_number; mesh_index++)
+			{
+				object_data mesh = get_mesh_geometry(scene, mesh_index);
+				material = scene->mMaterials[scene->mMeshes[mesh_index]->mMaterialIndex];
+				mesh.material = get_material_data(material, scene, mesh_index);
+				data.push_back(mesh); 
 
-			data.data = t_obj.get(); 
-			data.material = t_mtl.get(); 
-
-
-
-
-
-
-
-
-
+				
+			}
+			
 
 			return data;
-		 }
-	
-	
-	
-	
-	
-	
-	
-	
+		}
 	
 	
 	
