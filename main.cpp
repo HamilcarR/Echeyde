@@ -49,5 +49,7 @@ void Init_SDL() {
 	}
 
 void Quit_SDL() {
+	TextureArray* instance = TextureArray::getUniqueInstance();
+	instance->destroy();
 	SDL_Quit(); 
 }

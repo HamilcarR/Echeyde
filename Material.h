@@ -15,7 +15,7 @@ public:
 	void Unbind(); 
 	void Bind();
 	bool isTransparent() { return transparency; }
-	bool isTextured() { return !textures->isEmpty(); }
+	bool isTextured() { return !textures->isInitialized(); }
 private:
 	Shader shader;
 	glm::vec3 ambient_color;

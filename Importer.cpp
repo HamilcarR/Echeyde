@@ -29,27 +29,27 @@ namespace Echeyde {
 			textures_data tex_data;
 			for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_DIFFUSE); i++) {
 					std::string	path = load_texture(aiTextureType_DIFFUSE, i, material);
-					tex_data.diffuse.push_back(path);
+					tex_data.diffuse=(path);
 
 			}
 			for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_HEIGHT); i++) {
 				
 					std::string	path = load_texture(aiTextureType_HEIGHT, i, material);
-					tex_data.normal.push_back(path);
+					tex_data.normal = (path);
 				
 			}
 			for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_OPACITY); i++) {
 			
 				
 					std::string	path = load_texture(aiTextureType_OPACITY, i, material);
-					tex_data.opacity.push_back(path);
+					tex_data.opacity = (path);
 				
 			}
 			for (unsigned int i = 0; i < material->GetTextureCount(aiTextureType_UNKNOWN); i++) {
 				
 				
 					std::string	path = load_texture(aiTextureType_UNKNOWN, i, material);
-					tex_data.optional.push_back(path);
+					tex_data.optional = (path);
 				
 			}
 			return tex_data;

@@ -5,41 +5,46 @@
 
 const bool INVERT_Y = true;
 
-/*Texture Class*/
+TextureArray *TextureArray::instance = nullptr;
+
+
 /******************************************************************************************************************************************************************************************/
+/*Texture Class*/
 Texture::Texture() {
 	id = 0; 
 	texture = ""; 
 }
 /************************************************************************************/
 
-Texture::Texture(std::string& filename , bool invert_y)
+Texture::Texture(std::string& filename)
 {
-	glGenTextures(1, &id); 
-	int width = 0, height = 0; 
-	unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, 0, SOIL_LOAD_RGBA);
-	if (image == 0)
-		throw TextureException(filename);
-	else {
-		glBindTexture(GL_TEXTURE_2D, id);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -3.0);
-		glBindTexture(GL_TEXTURE_2D, 0); 
-	}
+
+		glGenTextures(1, &id);
+		int width = 0, height = 0; 
+		unsigned char* image = SOIL_load_image(filename.c_str(), &width, &height, 0, SOIL_LOAD_RGBA);
+		if (image == 0)
+			throw TextureException(filename);
+		else {
+			texture = filename;
+			glBindTexture(GL_TEXTURE_2D, id);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+			glGenerateMipmap(GL_TEXTURE_2D);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -3.0);
+			glBindTexture(GL_TEXTURE_2D, 0);
+		}
 	
 }
 
 
 Texture::~Texture()
 {
-	glDeleteTextures(1, &id);
+	glDeleteTextures(1, &id); 
 
 }
 /************************************************************************************/
@@ -68,42 +73,52 @@ bool Texture::isInitialized() {
 	return (id == 0 || texture.size()==0) ? false : true;
 }
 
+/************************************************************************************/
+bool Texture::operator==(Texture& A) {
+	if (texture.compare(A.texture) == 0)
+		return true;
+	else
+		return false; 
+}
 
 
 
 
 
-
-
-/*TextureGroup class*/
 /******************************************************************************************************************************************************************************************/
+/*TextureGroup class*/
 TextureGroup::TextureGroup() {
+	diffuse_textures = nullptr;
 
+
+	normal_textures = nullptr;
+
+
+	opacity_textures = nullptr;
+
+
+	distortion_textures = nullptr;
+
+	optional_textures = nullptr;
 }
 /************************************************************************************/
 TextureGroup::TextureGroup(material_data& mat) {
-	textures_data textures = mat.textures; 
+	TextureArray *instance = TextureArray::getUniqueInstance(); 
+	diffuse_textures = nullptr; 
+	normal_textures = nullptr;
+	opacity_textures = nullptr;
+	distortion_textures = nullptr;
+	optional_textures = nullptr;
 	try {
-		for (std::string &diffuse : textures.diffuse) {
+		
+			
+		if (!mat.diffuse_empty())	diffuse_textures=instance->addOrReturn(mat.textures.diffuse);
+		if (!mat.normal_empty())	normal_textures= instance->addOrReturn(mat.textures.normal);
+		if (!mat.opacity_empty())	opacity_textures = instance->addOrReturn(mat.textures.opacity);
+		if (!mat.distortion_empty()) distortion_textures = instance->addOrReturn(mat.textures.distortion);
+		if (!mat.optional_empty())	optional_textures = instance->addOrReturn(mat.textures.optional);
 
-			diffuse_textures.push_back(std::shared_ptr<Texture>(new Texture(diffuse, INVERT_Y)));
-		}
-		for (std::string &normal : textures.normal) {
-			normal_textures.push_back(std::shared_ptr<Texture>(new Texture(normal, INVERT_Y)));
-
-		}
-		for (std::string &opacity : textures.opacity) {
-			opacity_textures.push_back(std::shared_ptr<Texture>(new Texture(opacity, INVERT_Y)));
-
-		}
-		for (std::string &distortion : textures.distortion) {
-			distortion_textures.push_back(std::shared_ptr<Texture>(new Texture(distortion, INVERT_Y)));
-
-		}
-		for (std::string &optional : textures.optional) {
-			optional_textures.push_back(std::shared_ptr<Texture>(new Texture(optional, INVERT_Y)));
-
-		}
+		
 	}
 	catch (TextureException &e) {
 		std::cout << e.what() << std::endl;
@@ -122,24 +137,124 @@ TextureGroup::~TextureGroup() {
 
 
 /************************************************************************************/
-bool TextureGroup::isEmpty() {
-	if (diffuse_textures.empty() && normal_textures.empty() && distortion_textures.empty() && opacity_textures.empty() && optional_textures.empty())
-		return true;
-	else
+bool TextureGroup::isInitialized() {/*check null*/
+	if (diffuse_textures == nullptr && normal_textures == nullptr && opacity_textures == nullptr && distortion_textures == nullptr && optional_textures == nullptr && blend_textures == nullptr)
 		return false;
+	else {
+		if (diffuse_textures != nullptr && diffuse_textures->isInitialized() || normal_textures != nullptr && normal_textures->isInitialized()
+			|| opacity_textures != nullptr && opacity_textures->isInitialized() || distortion_textures != nullptr && distortion_textures->isInitialized()
+			|| optional_textures != nullptr && optional_textures->isInitialized() || blend_textures != nullptr && blend_textures->isInitialized())
+			return true;
+		else
+			return false;
+		
+	}
 }
 
 /************************************************************************************/
 
 void TextureGroup::bindFirst(GLuint programID) {
-	diffuse_textures[0]->Bind(Echeyde::DIFFUSE0, programID);
-	normal_textures[0]->Bind(Echeyde::NORMAL0, programID);
+	if (diffuse_textures != nullptr) diffuse_textures->Bind(Echeyde::DIFFUSE0, programID);
 	
+	if (normal_textures != nullptr) normal_textures->Bind(Echeyde::NORMAL0, programID);
+	
+	if (opacity_textures != nullptr) opacity_textures->Bind(Echeyde::OPACITY0, programID);
+
+	if (distortion_textures != nullptr) distortion_textures->Bind(Echeyde::DUDV0, programID);
+
+	if (optional_textures != nullptr) optional_textures->Bind(Echeyde::OPTIONAL0, programID);
+
+	if (blend_textures != nullptr) blend_textures->Bind(Echeyde::BLENDMAP0, programID);
+
 }
+	
 
 
 void TextureGroup::unbind() {
 	glBindTexture(GL_TEXTURE_2D, 0); 
 }
-/*TextureArray class*/
+
 /******************************************************************************************************************************************************************************************/
+/*TextureArray class*/
+
+
+TextureArray* TextureArray::getUniqueInstance() {
+	if (instance == nullptr)
+		instance = new TextureArray(); 
+	return instance;
+}
+
+/************************************************************************************/
+
+void TextureArray::destroy() {
+	delete instance;
+}
+
+/************************************************************************************/
+
+TextureArray::TextureArray() {
+
+}
+/************************************************************************************/
+
+TextureArray::~TextureArray() {
+
+}
+/************************************************************************************/
+
+std::shared_ptr<Texture> TextureArray::addOrReturn(std::string& file) {
+	for (const std::pair<unsigned int, std::shared_ptr<Texture>> &P : texture_array) {
+		if (P.second->getTextureFile().compare(file) == 0)
+			return P.second;
+	}
+	std::shared_ptr<Texture> tex;
+	try {
+		tex= std::shared_ptr<Texture>(new Texture(file));
+
+	}
+	catch (const TextureException& e) {
+		std::cout << e.what() << std::endl; 
+		return std::shared_ptr<Texture>(); 
+	}
+	std::pair<unsigned int, std::shared_ptr<Texture>> pair(tex->getTexture(), tex); 
+	texture_array.insert(pair); 
+	return tex; 
+}
+/************************************************************************************/
+
+bool TextureArray::idUsed(unsigned int id) {
+	auto it = texture_array.find(id);
+	if (it != texture_array.end())
+	{
+		if (glIsTexture(id))
+			return true;
+		else {
+			std::cout << "texture " + (*it).second->getTextureFile() + " TextureArray::idUsed() problem !" << "\n";
+			return false;
+		}
+	}
+	else
+		return false; 
+}
+/************************************************************************************/
+
+bool TextureArray::isLoadedTexture(std::string& filename) {
+	for (const std::pair<unsigned int, std::shared_ptr<Texture>> &P : texture_array) {
+		if (P.second->getTextureFile().compare(filename) == 0)
+			return true;
+	}
+	
+	return false; 
+}
+
+/************************************************************************************/
+
+
+bool TextureArray::erase(GLuint tex) {
+	auto it = texture_array.find(tex);
+	if (it != texture_array.end()) {
+		texture_array.erase(it); 
+		return true;
+	}
+	return false;
+}

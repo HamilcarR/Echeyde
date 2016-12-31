@@ -21,6 +21,8 @@ bool KInputs::Loop() {
 			return false;
 		if (event.key.keysym.sym == SDLK_ESCAPE)
 			return false;
+
+
 	}
 
 	return true;

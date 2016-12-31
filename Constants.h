@@ -16,7 +16,8 @@
 #include <thread>
 #include <future>
 #include <sstream>
-
+#include <map>
+#include <SDL\SDL.h>
 #ifdef WIN32
 #include <GL\glew.h>
 #else
@@ -28,10 +29,12 @@
 class Texture;
 
 /*Paths*/
-
 const std::string SHADER_LOCATION = "shaders/";
 const std::string RESSOURCES_LOCATION = "res/";
 const std::string TEXTURES_LOCATION = RESSOURCES_LOCATION + "textures/";
+
+
+/****************************************************************************************************************************************************************************/
 /*Constants*/
 const uint16_t WIDTH = 800; 
 const uint16_t HEIGHT = 800; 
@@ -42,16 +45,16 @@ const std::string M_MODEL = "model";
 const std::string M_VIEW = "view";
 static const char* shader_uniforms_texture_names[] = { "diffuse","normal","blendmap","specular","ambiant","height","dudv" };
 
+/****************************************************************************************************************************************************************************/
 /*Enums*/
 namespace Echeyde {
 	enum VBO : unsigned { VERTEX = 0, COLOR = 1, NORMAL = 2, TANGENT = 3, TEXTURE = 4,BITANGENT = 5, INDICE = 6   };
-	enum TEX : unsigned { DIFFUSE0 = 0 , NORMAL0 = 1 , BLENDMAP0 = 2 , SPECULAR0 = 3 , AMBIENT0 = 4 , HEIGHT0 = 5 , DUDV0 = 6 , OPTIONAL0 = 7 , OPTIONAL1 = 8 ,OPTIONAL2 = 9};
+	enum TEX : unsigned { DIFFUSE0 = 0 , NORMAL0 = 1 , OPACITY0=2, BLENDMAP0 = 3 , SPECULAR0 = 4 , AMBIENT0 = 5 , HEIGHT0 = 6 , DUDV0 = 7 , OPTIONAL0 = 8 , OPTIONAL1 = 9 ,OPTIONAL2 = 10};
 }
 
 
-
-/*Data structs*/
-
+/****************************************************************************************************************************************************************************/
+/*Data structs with their methods*/
 struct vertex_data {
 	glm::vec3 position; 
 	glm::vec2 texture;
@@ -59,7 +62,7 @@ struct vertex_data {
 	glm::vec3 color;
 };
 
-
+/*******************/
 struct geometry_data {
 public:
 	std::vector<float> vertex;
@@ -132,12 +135,15 @@ public:
 		file_o.close(); 
 	}
 };
+
+/*******************/
+
 struct textures_data {
-	std::vector<std::string> diffuse;
-	std::vector<std::string> normal;
-	std::vector<std::string> opacity;
-	std::vector<std::string> distortion;
-	std::vector<std::string> optional;
+	std::string diffuse;
+	std::string normal;
+	std::string opacity;
+	std::string distortion;
+	std::string optional;
 };
 
 struct material_data {
@@ -150,14 +156,31 @@ struct material_data {
 	textures_data textures;
 	
 
+	bool diffuse_empty() { return textures.diffuse.empty(); }
+	bool normal_empty() { return textures.normal.empty(); }
+	bool opacity_empty() { return (textures.opacity.empty()) ; }
+	bool distortion_empty() { return (textures.distortion.empty()); }
+	bool optional_empty() { return (textures.optional.empty()) ; }
 };
 
+/*******************/
 
 struct object_data {
 	geometry_data data; 
 	material_data material;
 };
+/*******************/
 
+struct uniform_struct {
+	GLuint vertex_u;
+	GLuint color_u;
+	GLuint texture_u;
+	GLuint tangent_u;
+	GLuint normal_u;
+
+};
+/****************************************************************************************************************************************************************************/
+/*basic 3D models*/
 const std::vector<float> cube = {
 	// front
 	-1.0, -1.0,  1.0,
@@ -202,15 +225,6 @@ const std::vector<unsigned short> indice = {// front
 	// right
 	3, 2, 6,
 	6, 7, 3 };
-
-struct uniform_struct {
-	GLuint vertex_u;
-	GLuint color_u;
-	GLuint texture_u;
-	GLuint tangent_u;
-	GLuint normal_u;
-
-};
 
 
 

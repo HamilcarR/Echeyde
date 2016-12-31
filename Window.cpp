@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "Importer.h"
+#include "Camera.h"
 class PrepareMeshes {
 public :
 	PrepareMeshes(std::vector<object_data> &list_mesh ,Shader& s,bool displayed) {
@@ -85,16 +86,24 @@ void Window::Loop() {
 	
 	
 	glm::mat4 projection = glm::perspective(75.f, float(HEIGHT/WIDTH), 0.001f, 1000.f); 
-	glm::mat4 view = glm::lookAt(glm::vec3(10, 0, -10), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)); 
+	glm::mat4 view = glm::lookAt(glm::vec3(50, 0, -50), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)); 
 	glm::mat4 model = glm::mat4(1.); 
 	PrepareMeshes display_meshes(st,shader, true);
-	
-
+	SDL_Event event; 
+	std::unique_ptr<Camera> user_camera = std::unique_ptr<Camera>(new Camera(1.f, 1.f, glm::vec3(0, 1, 0), 75.f, float(HEIGHT / WIDTH), 0.001f, 1000.f)); 
 	while (loop) {
-		loop = input->Loop();
+		while (SDL_PollEvent(&event)) {
+
+			if (event.type == SDL_QUIT)
+				loop = false;
+			if (event.key.keysym.sym == SDLK_ESCAPE)
+				loop= false;
+
+			user_camera->Move(event);
+		}
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
-		display_meshes.display(projection, model, view);
+	
+		display_meshes.display(user_camera->getProjectionMatrix(), model, user_camera->getViewMatrix());
 	
 		SDL_GL_SwapWindow(window); 
 		SDL_Delay(10);
