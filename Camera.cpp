@@ -4,7 +4,7 @@
 using namespace glm;
 
 
-constexpr double toRadian(float angle) {
+const double toRadian(float angle) {
 
 	return angle *  M_PI / 180;
 }
@@ -113,12 +113,12 @@ void  Camera::Move(SDL_Event &event) {
 
 		}
 		if (event.key.keysym.sym == SDLK_d) {
-			m_position = m_position - m_lateral * +speed;
+			m_position = m_position + m_lateral * +speed;
 			m_aim = m_position + m_orientation;
 
 		}
 		if (event.key.keysym.sym == SDLK_q) {
-			m_position = m_position + m_lateral*+speed;
+			m_position = m_position - m_lateral*+speed;
 			m_aim = m_position + m_orientation;
 
 		}

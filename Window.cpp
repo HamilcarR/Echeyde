@@ -50,6 +50,8 @@ Window::Window(const std::string name , Uint16 width , Uint16 height,KInputs &in
 	loop = true;
 	scene = &sc;
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE); 
+	glCullFace(GL_BACK); 
 
 }
 
@@ -106,7 +108,7 @@ void Window::Loop() {
 		display_meshes.display(user_camera->getProjectionMatrix(), model, user_camera->getViewMatrix());
 	
 		SDL_GL_SwapWindow(window); 
-		SDL_Delay(10);
+		SDL_Delay(1);
 	}
 
 

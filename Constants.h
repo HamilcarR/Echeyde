@@ -18,11 +18,8 @@
 #include <sstream>
 #include <map>
 #include <SDL\SDL.h>
-#ifdef WIN32
 #include <GL\glew.h>
-#else
-#define GL4_PROTOTYPES 1 
-#endif
+
 #include <vector>
 
 
