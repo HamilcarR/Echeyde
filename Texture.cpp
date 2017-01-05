@@ -44,8 +44,15 @@ Texture::Texture(std::string& filename)
 
 Texture::~Texture()
 {
-	glDeleteTextures(1, &id); 
+	
 
+}
+
+void Texture::clean(){
+	if (DEBUG_DESTRUCTOR)
+		std::cout << "Texture Deleted" << std::endl;
+
+	glDeleteTextures(1, &id);
 }
 /************************************************************************************/
 
@@ -74,41 +81,41 @@ bool Texture::isInitialized() {
 }
 
 /************************************************************************************/
-bool Texture::operator==(Texture& A) {
-	if (texture.compare(A.texture) == 0)
+bool Texture::operator==(Texture& A) const{
+	if (texture.compare(A.getTextureFile()) == 0)
 		return true;
 	else
 		return false; 
 }
 
-
+bool Texture::operator<(const Texture &A) const{
+	if (texture < A.getTextureFile())
+		return true;
+	else
+		return false;
+}
 
 
 
 /******************************************************************************************************************************************************************************************/
 /*TextureGroup class*/
 TextureGroup::TextureGroup() {
-	diffuse_textures = nullptr;
-
-
-	normal_textures = nullptr;
-
-
-	opacity_textures = nullptr;
-
-
-	distortion_textures = nullptr;
-
-	optional_textures = nullptr;
+	diffuse_textures = std::shared_ptr<Texture>(new Texture());
+	blend_textures = std::shared_ptr<Texture>(new Texture());
+	normal_textures = std::shared_ptr<Texture>(new Texture());
+	opacity_textures = std::shared_ptr<Texture>(new Texture());
+	distortion_textures = std::shared_ptr<Texture>(new Texture());
+	optional_textures = std::shared_ptr<Texture>(new Texture());
 }
 /************************************************************************************/
 TextureGroup::TextureGroup(material_data& mat) {
 	TextureArray *instance = TextureArray::getUniqueInstance(); 
-	diffuse_textures = nullptr; 
-	normal_textures = nullptr;
-	opacity_textures = nullptr;
-	distortion_textures = nullptr;
-	optional_textures = nullptr;
+	diffuse_textures = std::shared_ptr<Texture>(new Texture());
+	normal_textures = std::shared_ptr<Texture>(new Texture());
+	opacity_textures = std::shared_ptr<Texture>(new Texture());
+	distortion_textures = std::shared_ptr<Texture>(new Texture());
+	optional_textures = std::shared_ptr<Texture>(new Texture());
+	blend_textures = std::shared_ptr<Texture>(new Texture());
 	try {
 		
 			
@@ -117,7 +124,7 @@ TextureGroup::TextureGroup(material_data& mat) {
 		if (!mat.opacity_empty())	opacity_textures = instance->addOrReturn(mat.textures.opacity);
 		if (!mat.distortion_empty()) distortion_textures = instance->addOrReturn(mat.textures.distortion);
 		if (!mat.optional_empty())	optional_textures = instance->addOrReturn(mat.textures.optional);
-
+		Mdata = mat; 
 		
 	}
 	catch (TextureException &e) {
@@ -131,10 +138,19 @@ TextureGroup::TextureGroup(material_data& mat) {
 
 
 TextureGroup::~TextureGroup() {
-
+	
 }
 
-
+void TextureGroup::clean(){
+	if (DEBUG_DESTRUCTOR)
+		std::cout << "Texture group deleted" << std::endl;
+	if (diffuse_textures != nullptr) diffuse_textures->clean();
+	if (normal_textures != nullptr) normal_textures->clean();
+	if (opacity_textures != nullptr) opacity_textures->clean();
+	if (blend_textures != nullptr) blend_textures->clean();
+	if (distortion_textures != nullptr) distortion_textures->clean();
+	if (optional_textures != nullptr) optional_textures->clean();
+}
 
 /************************************************************************************/
 bool TextureGroup::isInitialized() {/*check null*/
@@ -151,20 +167,45 @@ bool TextureGroup::isInitialized() {/*check null*/
 	}
 }
 
+bool TextureGroup::operator<(const TextureGroup &A) const{
+	bool diffuse = diffuse_textures < A.getDiffuse_textures();
+	bool normal = normal_textures < A.getNormal_textures(); 
+	bool opacity = opacity_textures < A.getOpacity_textures(); 
+	bool optional = optional_textures < A.getOptional_textures(); 
+	bool blend = blend_textures < A.getBlend_textures(); 
+	bool disto = distortion_textures < A.getDistortion_textures();
+
+	return diffuse && normal && opacity && optional && blend && disto; 
+
+}
+/************************************************************************************/
+
+bool TextureGroup::operator==(TextureGroup &A) const{
+	if (*blend_textures == *A.getBlend_textures() 
+		&& *diffuse_textures == *A.getDiffuse_textures() 
+		&& *normal_textures == *A.getNormal_textures()
+		&& *distortion_textures == *A.getDistortion_textures() 
+		&& *opacity_textures == *A.getOpacity_textures() 
+		&& *optional_textures == *A.getOptional_textures())
+		return true;
+	else
+		return false; 
+}
+
 /************************************************************************************/
 
 void TextureGroup::bindFirst(GLuint programID) {
-	if (diffuse_textures != nullptr) diffuse_textures->Bind(Echeyde::DIFFUSE0, programID);
+	if (diffuse_textures != nullptr && diffuse_textures->isInitialized()) diffuse_textures->Bind(Echeyde::DIFFUSE0, programID);
 	
-	if (normal_textures != nullptr) normal_textures->Bind(Echeyde::NORMAL0, programID);
+	if (normal_textures != nullptr && normal_textures->isInitialized()) normal_textures->Bind(Echeyde::NORMAL0, programID);
 	
-	if (opacity_textures != nullptr) opacity_textures->Bind(Echeyde::OPACITY0, programID);
+	if (opacity_textures != nullptr && opacity_textures->isInitialized()) opacity_textures->Bind(Echeyde::OPACITY0, programID);
 
-	if (distortion_textures != nullptr) distortion_textures->Bind(Echeyde::DUDV0, programID);
+	if (distortion_textures != nullptr && distortion_textures->isInitialized()) distortion_textures->Bind(Echeyde::DUDV0, programID);
 
-	if (optional_textures != nullptr) optional_textures->Bind(Echeyde::OPTIONAL0, programID);
+	if (optional_textures != nullptr && optional_textures->isInitialized()) optional_textures->Bind(Echeyde::OPTIONAL0, programID);
 
-	if (blend_textures != nullptr) blend_textures->Bind(Echeyde::BLENDMAP0, programID);
+	if (blend_textures != nullptr && blend_textures->isInitialized()) blend_textures->Bind(Echeyde::BLENDMAP0, programID);
 
 }
 	
@@ -186,7 +227,7 @@ TextureArray* TextureArray::getUniqueInstance() {
 
 /************************************************************************************/
 
-void TextureArray::destroy() {
+void TextureArray::clean() {
 	delete instance;
 }
 
@@ -258,3 +299,5 @@ bool TextureArray::erase(GLuint tex) {
 	}
 	return false;
 }
+
+/************************************************************************************/

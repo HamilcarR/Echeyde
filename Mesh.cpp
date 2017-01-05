@@ -1,4 +1,12 @@
 #include "Mesh.h"
+#include "Renderer.h"
+
+
+
+
+
+
+
 
 
 Mesh::Mesh() {
@@ -8,7 +16,18 @@ Mesh::Mesh() {
 
 }
 
+Mesh::Mesh(const Mesh& copy){
+	data = copy.data;
+	draw_mode = copy.draw_mode;
+	textured_model = copy.textured_model;
+	material = copy.material; 
+	displayed = copy.displayed;
+	vao = copy.vao;
+	for (int i = 0; i < vbo_size; i++)
+		vbo[i] = copy.vbo[i];
 
+	uniforms = copy.uniforms; 
+}
 
 Mesh::Mesh(geometry_data &data_arg , std::shared_ptr<Material> &mat , bool isdisplayed)
 {
@@ -25,19 +44,32 @@ Mesh::Mesh(geometry_data &data_arg , std::shared_ptr<Material> &mat , bool isdis
 	uniforms.projection = glGetUniformLocation(material->getProgram(), M_PROJECTION.c_str());
 	uniforms.model = glGetUniformLocation(material->getProgram(), M_MODEL.c_str());
 	uniforms.view = glGetUniformLocation(material->getProgram(), M_VIEW.c_str());
+
+	
 }
 
 
 Mesh::~Mesh()
 {
 	
-	glDeleteVertexArrays(1, &vao);
-	glDeleteBuffers(vbo_size, vbo);
 	
 }
 
+void Mesh::clean(){
+	glDeleteVertexArrays(1, &vao);
+	glDeleteBuffers(vbo_size, vbo);
+}
 
 
+void Mesh::merge(Mesh& B){
+	assert(*getMaterial() == *B.getMaterial()); 
+	geometry_data new_geometry = geometry_data::merge(getGeometry(), B.getGeometry()); 
+	data = new_geometry; 
+	clean(); 
+	initVAO(); 
+	Bind(); 
+
+}
 
 
 void Mesh::initVAO() {

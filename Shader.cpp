@@ -46,17 +46,26 @@ Shader::Shader(std::string &v, std::string &f, std::string &g, std::string &t)
 
 Shader::~Shader()
 {
-	glDetachShader(programID, vertex_shader); 
-	glDetachShader(programID, fragment_shader); 
+
+	
+
+	
+	
+}
+
+void Shader::clean(){
+	if (DEBUG_DESTRUCTOR)
+		std::cout << "Shader Deleted" << std::endl;
+	glDetachShader(programID, vertex_shader);
+	glDetachShader(programID, fragment_shader);
 	if (geometry_shader_name.compare(" ") != 0)
 	{
-		glDetachShader(programID, geometry_shader); 
-		glDeleteShader(geometry_shader); 
+		glDetachShader(programID, geometry_shader);
+		glDeleteShader(geometry_shader);
 	}
-	glDeleteShader(vertex_shader); 
+	glDeleteShader(vertex_shader);
 	glDeleteShader(fragment_shader);
-	glDeleteProgram(programID); 
-	
+	glDeleteProgram(programID);
 }
 
 /*****************************************************************************************************************************************/
@@ -203,3 +212,11 @@ void Shader::create_shaders() {
 
 
 /*****************************************************************************************************************************************/
+
+bool Shader::operator==(const Shader A) const{
+	if (vertex_shader_name.compare(A.getVertexShader()) == 0 && fragment_shader_name.compare(A.getFragmentShader()) == 0
+		&& geometry_shader_name.compare(A.getGeometryShader()) == 0 && tesselation_shader_name.compare(A.getTesselationShader()) == 0)
+		return true;
+	else
+		return false; 
+}

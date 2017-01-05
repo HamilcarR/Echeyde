@@ -10,12 +10,21 @@ public:
 	Material(Shader &shader, TextureGroup& textures);
 	Material(Shader &shader, material_data& material_dat);
 	Material(Shader &shader, TextureGroup& textures,bool transparency);
+	Material(const Material &A); 
 	virtual ~Material();
-	GLuint getProgram();
+	virtual void clean();
+	const GLuint getProgram() const;
 	void Unbind(); 
 	void Bind();
 	bool isTransparent() { return transparency; }
 	bool isTextured() { return !textures->isInitialized(); }
+	bool operator==( Material A); 
+	bool operator<(const Material &A) const;
+	Material& operator=(Material& A);
+	const TextureGroup getTextureGroup() const { return *textures;  }
+	const Shader getShader() const { return shader;}
+	float getSpecularExponent(){ return specular_exponent; }
+	float getReflectivity(){ return reflectivity;  }
 private:
 	Shader shader;
 	glm::vec3 ambient_color;

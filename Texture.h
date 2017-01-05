@@ -9,12 +9,14 @@ public:
 	Texture(); 
 	Texture(std::string &image);
 	virtual ~Texture();
+	virtual void clean();
 	GLuint getTexture(); 
 	virtual void Bind(Echeyde::TEX texture_type, GLuint programID);
 	void Unbind(); 
 	bool isInitialized();
-	bool operator==(Texture &A);
-	std::string& getTextureFile() { return texture; }
+	bool operator==(Texture &A) const;
+	bool operator<(const Texture &A) const; 
+	const std::string& getTextureFile() const { return texture; }
 private:
 	std::string texture;
 	GLuint id; 
@@ -27,19 +29,24 @@ public:
 	TextureGroup();
 	TextureGroup(material_data &data);
 	virtual ~TextureGroup();
-	std::shared_ptr<Texture> getDiffuse_textures() { return diffuse_textures; }
-	std::shared_ptr<Texture> getNormal_textures() { return normal_textures; }
-	std::shared_ptr<Texture> getOpacity_textures() { return opacity_textures; }
-	std::shared_ptr<Texture> getDistortion_textures() { return distortion_textures; }
-	std::shared_ptr<Texture> getOptional_textures() { return optional_textures; }
-	std::shared_ptr<Texture> getBlend_textures() { return blend_textures; }
+	virtual void clean();
 
-	
+	const std::shared_ptr<Texture> getDiffuse_textures() const  { return diffuse_textures; }
+	const std::shared_ptr<Texture> getNormal_textures() const { return normal_textures; }
+	const std::shared_ptr<Texture> getOpacity_textures() const { return opacity_textures; }
+	const std::shared_ptr<Texture> getDistortion_textures() const { return distortion_textures; }
+	const std::shared_ptr<Texture> getOptional_textures() const { return optional_textures; }
+	const std::shared_ptr<Texture> getBlend_textures() const { return blend_textures; }
 
+	bool operator==(TextureGroup &A) const;
+	bool operator<(const TextureGroup &A) const; 
 	void bindFirst(GLuint programID);
 	void unbind();
 	bool isInitialized();
+	const material_data getMaterialData() const { return Mdata; }
 private:
+
+	material_data Mdata; 
 	std::shared_ptr<Texture> diffuse_textures;
 	std::shared_ptr<Texture> normal_textures;
 	std::shared_ptr<Texture> opacity_textures;
@@ -57,8 +64,7 @@ class TextureArray {
 
 public : 
 	static TextureArray* getUniqueInstance();
-	static void destroy();
-
+	static void clean();
 	/*if texture_file doesn't exist in database,will create
 	*a new texture then return it...if it exists,return the existant texture
 	*/

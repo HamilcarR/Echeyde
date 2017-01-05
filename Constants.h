@@ -43,6 +43,11 @@ const std::string M_VIEW = "view";
 static const char* shader_uniforms_texture_names[] = { "diffuse","normal","blendmap","specular","ambiant","height","dudv" };
 
 /****************************************************************************************************************************************************************************/
+/*Debug vars*/
+static const bool DEBUG_DESTRUCTOR = true; 
+
+
+/****************************************************************************************************************************************************************************/
 /*Enums*/
 namespace Echeyde {
 	enum VBO : unsigned { VERTEX = 0, COLOR = 1, NORMAL = 2, TANGENT = 3, TEXTURE = 4,BITANGENT = 5, INDICE = 6   };
@@ -69,6 +74,55 @@ public:
 	std::vector<float> tangent; 
 	std::vector<float> color; 
 	std::vector<float> bitangent;
+
+
+
+	static geometry_data merge(geometry_data data1, geometry_data data2){
+		
+		geometry_data result;
+		result.vertex.reserve(data1.vertex.size() + data2.vertex.size());
+		result.indices.reserve(data1.indices.size() + data2.indices.size());
+		result.texture.reserve(data1.texture.size() + data2.texture.size());
+		result.normal.reserve(data1.normal.size() + data2.normal.size());
+		result.tangent.reserve(data1.tangent.size() + data2.tangent.size());
+		result.color.reserve(data1.color.size() + data2.color.size());
+		result.bitangent.reserve(data1.bitangent.size() + data2.bitangent.size());
+
+		result.vertex.insert(result.vertex.end(), data1.vertex.begin(), data1.vertex.end());
+		result.vertex.insert(result.vertex.end(), data2.vertex.begin(), data2.vertex.end());
+
+		result.texture.insert(result.texture.end(), data1.texture.begin(), data1.texture.end());
+		result.texture.insert(result.texture.end(), data2.texture.begin(), data2.texture.end());
+
+		result.indices.insert(result.indices.end(), data1.indices.begin(), data1.indices.end());
+		for (unsigned short i : data2.indices)
+			result.indices.push_back(i+data1.vertex.size()/3); 
+
+		result.normal.insert(result.normal.end(), data1.normal.begin(), data1.normal.end());
+		result.normal.insert(result.normal.end(), data2.normal.begin(), data2.normal.end());
+
+		result.tangent.insert(result.tangent.end(), data1.tangent.begin(), data1.tangent.end());
+		result.tangent.insert(result.tangent.end(), data2.tangent.begin(), data2.tangent.end());
+
+		result.color.insert(result.color.end(), data1.color.begin(), data1.color.end());
+		result.color.insert(result.color.end(), data2.color.begin(), data2.color.end());
+
+		result.bitangent.insert(result.bitangent.end(), data1.bitangent.begin(), data1.bitangent.end());
+		result.bitangent.insert(result.bitangent.end(), data2.bitangent.begin(), data2.bitangent.end());
+		return result;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
 	void print(std::ofstream &file_o) {
 		int rap = 1;
 		file_o << "Vertices :\n";
