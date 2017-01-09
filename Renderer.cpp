@@ -59,7 +59,7 @@ void Renderer::addDynamicMeshes(std::vector<Mesh> &A){
 	
 }
 
-void Renderer::addDynamicMeshes(std::vector<object_data> &list_mesh, Shader& s, bool displayed){
+void Renderer::addDynamicMeshes(std::vector<object_data> &list_mesh, Shader* s, bool displayed){
 	std::vector<Mesh> meshes; 
 	for (object_data i : list_mesh) {
 		std::shared_ptr<Material> material =std::shared_ptr<Material>(new Material(s, i.material));
@@ -87,7 +87,6 @@ void Renderer::addStaticMesh(Mesh& A){
 	for (std::pair<Material, Mesh> &paire : static_mesh_list){
 
 		if (paire.first == *A.getMaterial()){
-			//assert(*paire.second.getMaterial() == *A.getMaterial()); 
 			paire.second.merge(A);
 			return;
 		}
@@ -122,7 +121,7 @@ void Renderer::addStaticMeshes(std::vector<Mesh> &A){
 
 }
 
-void Renderer::addStaticMeshes(std::vector<object_data> &list_mesh, Shader& s, bool displayed){
+void Renderer::addStaticMeshes(std::vector<object_data> &list_mesh, Shader* s, bool displayed){
 	std::vector<Mesh> meshes;
 	for (object_data i : list_mesh) {
 		std::shared_ptr<Material> material = std::shared_ptr<Material>(new Material(s, i.material));

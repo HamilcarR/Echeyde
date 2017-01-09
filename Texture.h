@@ -1,7 +1,7 @@
 #pragma once
 #include "Constants.h"
 #include <unordered_map>
-
+#include "Shader.h"
 
 class Texture
 {
@@ -11,7 +11,7 @@ public:
 	virtual ~Texture();
 	virtual void clean();
 	GLuint getTexture(); 
-	virtual void Bind(Echeyde::TEX texture_type, GLuint programID);
+	virtual void Bind(Echeyde::TEX texture_type, Shader* shader);
 	void Unbind(); 
 	bool isInitialized();
 	bool operator==(Texture &A) const;
@@ -40,7 +40,7 @@ public:
 
 	bool operator==(TextureGroup &A) const;
 	bool operator<(const TextureGroup &A) const; 
-	void bindFirst(GLuint programID);
+	void bindFirst(Shader* shader);
 	void unbind();
 	bool isInitialized();
 	const material_data getMaterialData() const { return Mdata; }

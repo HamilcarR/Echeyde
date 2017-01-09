@@ -62,9 +62,11 @@ GLuint Texture::getTexture() {
 }
 /************************************************************************************/
 
-void Texture::Bind(Echeyde::TEX tex_index , GLuint programID) {
+void Texture::Bind(Echeyde::TEX tex_index , Shader *shader) {
 	assert(id != 0);
-	glUniform1i(glGetUniformLocation(programID, shader_uniforms_texture_names[tex_index]), tex_index);
+	assert(shader != nullptr); 
+	shader->BindTextures(tex_index, shader_uniforms_texture_names[tex_index]);
+	
 	glActiveTexture(GL_TEXTURE0 + tex_index);
 	glBindTexture(GL_TEXTURE_2D, id);
 
@@ -194,18 +196,18 @@ bool TextureGroup::operator==(TextureGroup &A) const{
 
 /************************************************************************************/
 
-void TextureGroup::bindFirst(GLuint programID) {
-	if (diffuse_textures != nullptr && diffuse_textures->isInitialized()) diffuse_textures->Bind(Echeyde::DIFFUSE0, programID);
+void TextureGroup::bindFirst(Shader* shader) {
+	if (diffuse_textures != nullptr && diffuse_textures->isInitialized()) diffuse_textures->Bind(Echeyde::DIFFUSE0, shader);
 	
-	if (normal_textures != nullptr && normal_textures->isInitialized()) normal_textures->Bind(Echeyde::NORMAL0, programID);
+	if (normal_textures != nullptr && normal_textures->isInitialized()) normal_textures->Bind(Echeyde::NORMAL0, shader);
 	
-	if (opacity_textures != nullptr && opacity_textures->isInitialized()) opacity_textures->Bind(Echeyde::OPACITY0, programID);
+	if (opacity_textures != nullptr && opacity_textures->isInitialized()) opacity_textures->Bind(Echeyde::OPACITY0, shader);
 
-	if (distortion_textures != nullptr && distortion_textures->isInitialized()) distortion_textures->Bind(Echeyde::DUDV0, programID);
+	if (distortion_textures != nullptr && distortion_textures->isInitialized()) distortion_textures->Bind(Echeyde::DUDV0, shader);
 
-	if (optional_textures != nullptr && optional_textures->isInitialized()) optional_textures->Bind(Echeyde::OPTIONAL0, programID);
+	if (optional_textures != nullptr && optional_textures->isInitialized()) optional_textures->Bind(Echeyde::OPTIONAL0, shader);
 
-	if (blend_textures != nullptr && blend_textures->isInitialized()) blend_textures->Bind(Echeyde::BLENDMAP0, programID);
+	if (blend_textures != nullptr && blend_textures->isInitialized()) blend_textures->Bind(Echeyde::BLENDMAP0, shader);
 
 }
 	

@@ -1,6 +1,6 @@
 #ifndef CONSTANTS_H
 #define CONSTANTS_H
-
+#define LIGHTS_COUNT_SHADER 10
 
 
 #include <iostream>
@@ -42,6 +42,9 @@ const std::string M_MODEL = "model";
 const std::string M_VIEW = "view";
 static const char* shader_uniforms_texture_names[] = { "diffuse","normal","blendmap","specular","ambiant","height","dudv" };
 
+
+
+
 /****************************************************************************************************************************************************************************/
 /*Debug vars*/
 static const bool DEBUG_DESTRUCTOR = true; 
@@ -51,7 +54,9 @@ static const bool DEBUG_DESTRUCTOR = true;
 /*Enums*/
 namespace Echeyde {
 	enum VBO : unsigned { VERTEX = 0, COLOR = 1, NORMAL = 2, TANGENT = 3, TEXTURE = 4,BITANGENT = 5, INDICE = 6   };
-	enum TEX : unsigned { DIFFUSE0 = 0 , NORMAL0 = 1 , OPACITY0=2, BLENDMAP0 = 3 , SPECULAR0 = 4 , AMBIENT0 = 5 , HEIGHT0 = 6 , DUDV0 = 7 , OPTIONAL0 = 8 , OPTIONAL1 = 9 ,OPTIONAL2 = 10};
+	enum TEX : unsigned { DIFFUSE0 = 0 , NORMAL0 = 1 , OPACITY0=2, BLENDMAP0 = 3 , SPECULAR0 = 4 , AMBIENT0 = 5 , HEIGHT0 = 6 , DUDV0 = 7 , DATA = 8 , OPTIONAL0 = 9 ,OPTIONAL1 = 10};
+	enum LIGHTTYPE : unsigned { DIRECTIONAL = 0, POINT = 1, SPOT = 2 };
+
 }
 
 
@@ -232,50 +237,56 @@ struct uniform_struct {
 };
 /****************************************************************************************************************************************************************************/
 /*basic 3D models*/
-const std::vector<float> cube = {
-	// front
-	-1.0, -1.0,  1.0,
-	1.0, -1.0,  1.0,
-	1.0,  1.0,  1.0,
-	-1.0,  1.0,  1.0,
-	// back
-	-1.0, -1.0, -1.0,
-	1.0, -1.0, -1.0,
-	1.0,  1.0, -1.0,
-	-1.0,  1.0, -1.0
-};
+
+namespace echeyde{
+	namespace testing{
+		const std::vector<float> cube = {
+			// front
+			-1.0, -1.0, 1.0,
+			1.0, -1.0, 1.0,
+			1.0, 1.0, 1.0,
+			-1.0, 1.0, 1.0,
+			// back
+			-1.0, -1.0, -1.0,
+			1.0, -1.0, -1.0,
+			1.0, 1.0, -1.0,
+			-1.0, 1.0, -1.0
+		};
 
 
-const std::vector<float> color = {
-	// front colors
-	1.0, 0.0, 0.0,
-	0.0, 1.0, 0.0,
-	0.0, 0.0, 1.0,
-	1.0, 1.0, 1.0,
-	// back colors
-	1.0, 0.0, 0.0,
-	0.0, 1.0, 0.0,
-	0.0, 0.0, 1.0,
-	1.0, 1.0, 1.0
-};
-const std::vector<unsigned short> indice = {// front
-	0, 1, 2,
-	2, 3, 0,
-	// top
-	1, 5, 6,
-	6, 2, 1,
-	// back
-	7, 6, 5,
-	5, 4, 7,
-	// bottom
-	4, 0, 3,
-	3, 7, 4,
-	// left
-	4, 5, 1,
-	1, 0, 4,
-	// right
-	3, 2, 6,
-	6, 7, 3 };
+		const std::vector<float> color = {
+			// front colors
+			1.0, 0.0, 0.0,
+			0.0, 1.0, 0.0,
+			0.0, 0.0, 1.0,
+			1.0, 1.0, 1.0,
+			// back colors
+			1.0, 0.0, 0.0,
+			0.0, 1.0, 0.0,
+			0.0, 0.0, 1.0,
+			1.0, 1.0, 1.0
+		};
+		const std::vector<unsigned short> indice = {// front
+			0, 1, 2,
+			2, 3, 0,
+			// top
+			1, 5, 6,
+			6, 2, 1,
+			// back
+			7, 6, 5,
+			5, 4, 7,
+			// bottom
+			4, 0, 3,
+			3, 7, 4,
+			// left
+			4, 5, 1,
+			1, 0, 4,
+			// right
+			3, 2, 6,
+			6, 7, 3 };
+
+	}
+}
 
 
 

@@ -1,4 +1,5 @@
 #version 450 compatibility
+#define MAX_LIGHTS 10
 
 layout(location=0) in vec3 vertex;
 layout(location=1) in vec3 color;
@@ -11,10 +12,20 @@ uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view; 
 
-out vec3 col ;
+
+out vec3 col;
 out vec2 tex;
+out vec3 norm;
+out vec3 fragLoc;
+
+
 void main(){
-	gl_Position = projection*view*model*vec4(vertex,1.); 
+	mat4 MVP = projection*view*model;
+	gl_Position = MVP*vec4(vertex,1.); 
 	col=color; 
 	tex=texture;
+	norm=(model * vec4(normal,0.)).xyz;
+	fragLoc = (model*(vec4(vertex,1.))).xyz;
+
+	
 }

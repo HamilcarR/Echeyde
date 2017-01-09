@@ -41,9 +41,7 @@ Mesh::Mesh(geometry_data &data_arg , std::shared_ptr<Material> &mat , bool isdis
 	displayed = isdisplayed;
 	initVAO(); 
 	Bind();
-	uniforms.projection = glGetUniformLocation(material->getProgram(), M_PROJECTION.c_str());
-	uniforms.model = glGetUniformLocation(material->getProgram(), M_MODEL.c_str());
-	uniforms.view = glGetUniformLocation(material->getProgram(), M_VIEW.c_str());
+	
 
 	
 }
@@ -167,10 +165,9 @@ void Mesh::display(glm::mat4 &projection, glm::mat4 &model, glm::mat4 &view) {
 
 		glBindVertexArray(vao);
 		{
-			glUniformMatrix4fv(uniforms.projection, 1, GL_FALSE, glm::value_ptr(projection));
-			glUniformMatrix4fv(uniforms.view, 1, GL_FALSE, glm::value_ptr(view));
-			glUniformMatrix4fv(uniforms.model, 1, GL_FALSE, glm::value_ptr(model));
-
+			material->getShader()->BindMatrices(projection, view, model); 
+			BaseShader* s = dynamic_cast<BaseShader*>(const_cast<Shader*>((material->getShader()))); 
+			s->BindLights(); 
 			glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_SHORT, 0);
 		}
 		glBindVertexArray(vao);

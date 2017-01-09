@@ -29,6 +29,7 @@ Camera::Camera(float sensibility, float speed, glm::vec3 vertical, float FOV, fl
 	m_phi = 0.F;
 	m_theta = 0.F;
 	m_orientation = vec3(5, 0, 0);
+	m_vertical = vertical; 
 	m_lateral = vec3(0);
 	m_position = vec3(0, 3, 0);
 	m_aim = vec3(0, 0, 0);

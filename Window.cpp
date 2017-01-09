@@ -2,7 +2,7 @@
 #include "Importer.h"
 #include "Camera.h"
 #include "Renderer.h"
-
+#include "Light.h"
 Window::Window(const std::string name , Uint16 width , Uint16 height,KInputs &inputs , Echeyde::Scene &sc)
 {
 	dimensions.height = height; 
@@ -50,7 +50,7 @@ Dim Window::getDimensions() {
 }
 
 void Window::Loop() {
-	Shader shader(std::string("vertex.vert"), std::string("fragment.frag") , std::string("geometry.geom"));
+	BaseShader *shader = new BaseShader(std::string("vertex.vert"), std::string("fragment.frag") , std::string("geometry.geom"));
 	std::vector<object_data> st;
 	
 	try {
@@ -67,11 +67,20 @@ void Window::Loop() {
 	}
 	
 	Renderer *renderer = Renderer::getInstance();
-	
+	LightArray *instance = LightArray::getInstance();
+
 	glm::mat4 projection = glm::perspective(75.f, float(HEIGHT/WIDTH), 0.001f, 1000.f); 
-	glm::mat4 view = glm::lookAt(glm::vec3(50, 0, -50), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)); 
+	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)); 
 	glm::mat4 model = glm::mat4(1.); 
 	//renderer->addDynamicMeshes(st,shader, true);
+	
+	shader_light_data data;
+	data.base.position = glm::vec3(0, 3, 0); 
+	data.attenuation = glm::vec3(10, 10, 100);
+	data.radius = 100.f; 
+	data.base.colour = glm::vec3(0.4, 0.07, 0.1); 
+	data.base.power = 2000.F;
+	instance->addLight(new PointLight(data.base,data.radius,data.attenuation ));
 	renderer->addStaticMeshes(st, shader, true); 
 	SDL_Event event; 
 	std::unique_ptr<Camera> user_camera = std::unique_ptr<Camera>(new Camera(1.f, 1.f, glm::vec3(0, 1, 0), 75.f, float(HEIGHT / WIDTH), 0.001f, 1000.f)); 
@@ -87,8 +96,8 @@ void Window::Loop() {
 
 			user_camera->Move(event);
 		}
+		//instance->getLightArray()[0]->setPosition(user_camera->getPosition());
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		//renderer->renderDynamicMeshes(user_camera->getProjectionMatrix(), model, user_camera->getViewMatrix()); 
 
 		renderer->renderStaticMeshes(user_camera->getProjectionMatrix(), model, user_camera->getViewMatrix()); 
 	
@@ -96,7 +105,8 @@ void Window::Loop() {
 	}
 	TextureArray::clean();
 	renderer->destroy();
-
+	instance->clean(); 
+	delete shader;
 
 
 	

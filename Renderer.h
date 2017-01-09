@@ -10,10 +10,10 @@ public:
 	 void destroy(); 
 	void addDynamicMesh(Mesh& M);
 	void addDynamicMeshes(std::vector<Mesh> &meshes);
-	void addDynamicMeshes(std::vector<object_data> &list_mesh, Shader& s, bool displayed);
+	void addDynamicMeshes(std::vector<object_data> &list_mesh, Shader* s, bool displayed);
 	void addStaticMesh(Mesh &mesh);
 	void addStaticMeshes(std::vector<Mesh> &meshes);
-	void addStaticMeshes(std::vector<object_data> &list_mesh, Shader& s, bool displayed);
+	void addStaticMeshes(std::vector<object_data> &list_mesh, Shader* s, bool displayed);
 	void renderAll();
 	void renderStaticMeshes(glm::mat4 projection, glm::mat4 model , glm::mat4 view);
 	void renderDynamicMeshes(glm::mat4 projection, glm::mat4 model , glm::mat4 view); 

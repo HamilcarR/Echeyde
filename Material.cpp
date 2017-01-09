@@ -7,6 +7,7 @@ Material::Material() {
 }
 
 Material::Material(const Material &A){
+	assert(shader != nullptr); 
 	shader = A.getShader(); 
 	material_data mdat = A.getTextureGroup().getMaterialData(); 
 	textures = std::shared_ptr<TextureGroup>(new TextureGroup(mdat)); 
@@ -19,26 +20,26 @@ Material::Material(const Material &A){
 
 }
 
-Material::Material(Shader &s)
+Material::Material(Shader *s)
 {
 	shader = s; 
 }
 
-Material::Material(Shader &s, TextureGroup &tex) {
+Material::Material(Shader *s, TextureGroup &tex) {
 	shader = s;
 	textures = std::shared_ptr<TextureGroup>(new TextureGroup(tex));
 	specular_exponent = 0.f;
 	reflectivity = 0.f;
 }
 
-Material::Material(Shader &s, TextureGroup &tex,bool trans) {
+Material::Material(Shader *s, TextureGroup &tex,bool trans) {
 	shader = s;
 	textures = std::shared_ptr<TextureGroup>(new TextureGroup(tex));
 	transparency = trans;
 	specular_exponent = 0.f;
 	reflectivity = 0.f;
 }
-Material::Material(Shader &s, material_data& data) {
+Material::Material(Shader *s, material_data& data) {
 	specular_exponent = 0.f;
 	reflectivity = 0.f;
 	shader = s;
@@ -55,7 +56,7 @@ Material::~Material()
 void Material::clean(){
 	if (DEBUG_DESTRUCTOR)
 		std::cout << "Material deleted" << std::endl;
-	shader.clean();
+	shader->clean();
 	textures->clean();
 	
 }
@@ -63,13 +64,13 @@ void Material::clean(){
 
 const GLuint Material::getProgram() const {
 	
-	return shader.getProgram();
+	return shader->getProgram();
 }
 
 
 void Material::Bind() {
-	glUseProgram(shader.getProgram()); 
-	textures->bindFirst(getProgram()); 
+	glUseProgram(shader->getProgram());
+	textures->bindFirst(shader);
 }
 
 
