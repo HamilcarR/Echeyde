@@ -14,33 +14,37 @@ Material::Material(const Material &A){
 	ambient_color = A.ambient_color;
 	specular_color = A.specular_color;
 	specular_exponent = A.specular_exponent;
+	specular_power = A.specular_power; 
 	reflectivity = A.reflectivity;
 	transparency = A.transparency;
 
 
 }
 
-Material::Material(Shader *s)
+Material::Material(BaseShader *s)
 {
 	shader = s; 
 }
 
-Material::Material(Shader *s, TextureGroup &tex) {
+Material::Material(BaseShader *s, TextureGroup &tex) {
 	shader = s;
 	textures = std::shared_ptr<TextureGroup>(new TextureGroup(tex));
 	specular_exponent = 0.f;
+	specular_power = 0.f;
 	reflectivity = 0.f;
 }
 
-Material::Material(Shader *s, TextureGroup &tex,bool trans) {
+Material::Material(BaseShader *s, TextureGroup &tex, bool trans) {
 	shader = s;
 	textures = std::shared_ptr<TextureGroup>(new TextureGroup(tex));
 	transparency = trans;
 	specular_exponent = 0.f;
+	specular_power = 0.f;
 	reflectivity = 0.f;
 }
-Material::Material(Shader *s, material_data& data) {
-	specular_exponent = 0.f;
+Material::Material(BaseShader *s, material_data& data) {
+	specular_exponent = data.specular_exponent;
+	specular_power = data.specular_strength;
 	reflectivity = 0.f;
 	shader = s;
 	transparency = data.transparency;
@@ -67,10 +71,15 @@ const GLuint Material::getProgram() const {
 	return shader->getProgram();
 }
 
+void Material::BindValues(){
+
+}
 
 void Material::Bind() {
 	glUseProgram(shader->getProgram());
-	textures->bindFirst(shader);
+	if (isTextured())
+		textures->bindFirst(shader);
+	shader->BindMaterials(specular_power, specular_exponent,isTextured());
 }
 
 

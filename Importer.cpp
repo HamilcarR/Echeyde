@@ -100,7 +100,7 @@ namespace Echeyde {
 		
 		
 		
-		static material_data get_material_data(const aiMaterial *material,const aiScene* scene, unsigned int mesh_index) {
+		static material_data get_material_data(const aiMaterial *material, const aiScene* scene, unsigned int mesh_index, bool transparency) {
 			material_data material_dat; 
 			textures_data tex_data = get_texture_data(material, scene, mesh_index);
 			material_dat.textures = tex_data;
@@ -108,8 +108,9 @@ namespace Echeyde {
 			material->Get(AI_MATKEY_SHININESS_STRENGTH, strength);
 			material->Get(AI_MATKEY_SHININESS, shine);
 			shine = shine / 4; 
-			material_dat.specular_exponent = shine;
+			material_dat.specular_exponent = (shine<140) ? shine : 140;
 			material_dat.specular_strength = strength; 
+			material_dat.transparency = transparency;
 			return material_dat; 
 		}
 
@@ -119,7 +120,7 @@ namespace Echeyde {
 		
 /**********************************************************************************************************************************************/
 
-		std::vector<object_data> Importer::load_model(std::string& filename) {
+		std::vector<object_data> Importer::load_model(std::string& filename, bool transparency) {
 			std::vector<object_data> data;
 			Assimp::Importer importer;
 			const aiScene *scene = importer.ReadFile(RESSOURCES_LOCATION+filename, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_JoinIdenticalVertices);
@@ -133,7 +134,7 @@ namespace Echeyde {
 			{
 				object_data mesh = get_mesh_geometry(scene, mesh_index);
 				material = scene->mMaterials[scene->mMeshes[mesh_index]->mMaterialIndex];
-				mesh.material = get_material_data(material, scene, mesh_index);
+				mesh.material = get_material_data(material, scene, mesh_index,transparency);
 				data.push_back(mesh); 
 
 				
@@ -144,7 +145,41 @@ namespace Echeyde {
 		}
 	
 	
-	
-	
+/**********************************************************************************************************************************************/
+		material_data Importer::getMaterial(std::string &file , bool transparency){
+			std::vector<object_data> object;
+			try{
+				object = load_model(file,transparency);
+			}
+			catch (const File_not_found &e) {
+				std::cout << e.what() << std::endl;
+			}
+			catch (const MaterialException &e) {
+				std::cout << e.what() << std::endl;
+			}
+			catch (const Importer_Error &e) {
+				std::cout << e.what() << std::endl;
+			}
+			
+			assert(object.size() == 1); 
+			return object[0].material; 
+
+
+
+		}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	}
 }

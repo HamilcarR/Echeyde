@@ -11,13 +11,13 @@
 
 Mesh::Mesh() {
 	draw_mode = GL_STATIC_DRAW;
-	 
 	displayed = false;
 
 }
 
 Mesh::Mesh(const Mesh& copy){
 	data = copy.data;
+	transform = copy.transform;
 	draw_mode = copy.draw_mode;
 	textured_model = copy.textured_model;
 	material = copy.material; 
@@ -39,6 +39,7 @@ Mesh::Mesh(geometry_data &data_arg , std::shared_ptr<Material> &mat , bool isdis
 		textured_model = false;
 	material = mat; 
 	displayed = isdisplayed;
+	
 	initVAO(); 
 	Bind();
 	
@@ -48,7 +49,7 @@ Mesh::Mesh(geometry_data &data_arg , std::shared_ptr<Material> &mat , bool isdis
 
 
 Mesh::~Mesh()
-{
+{ 
 	
 	
 }
@@ -62,6 +63,7 @@ void Mesh::clean(){
 void Mesh::merge(Mesh& B){
 	assert(*getMaterial() == *B.getMaterial()); 
 	geometry_data new_geometry = geometry_data::merge(getGeometry(), B.getGeometry()); 
+	/*add transform*/
 	data = new_geometry; 
 	clean(); 
 	initVAO(); 
@@ -157,25 +159,72 @@ void Mesh::Unbind() {
 
 
 
-void Mesh::display(glm::mat4 &projection, glm::mat4 &model, glm::mat4 &view) {
+void Mesh::display_dynamic(glm::mat4 &projection, glm::mat4 &view) {
 
 	if (displayed) {
-		material->Bind();
-		Bind();
+		if (isTransparent()){
+			glDisable(GL_CULL_FACE);
+			Bind();
+			getMaterial()->getShader()->BindMatrices(projection, view, transform.getModelMatrix());
+			glBindVertexArray(vao);
+			{
 
-		glBindVertexArray(vao);
-		{
-			material->getShader()->BindMatrices(projection, view, model); 
-			BaseShader* s = dynamic_cast<BaseShader*>(const_cast<Shader*>((material->getShader()))); 
-			s->BindLights(); 
-			glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_SHORT, 0);
+				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_SHORT, 0);
+			}
+			glBindVertexArray(vao);
+			Unbind();
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
 		}
-		glBindVertexArray(vao);
-		Unbind();
+		else{
+			Bind();
 
+			glBindVertexArray(vao);
+			{
+
+				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_SHORT, 0);
+			}
+			glBindVertexArray(vao);
+			Unbind();
+		}
 		
 		
-		material->Unbind(); 
+
+	}
+}
+
+
+void Mesh::display_static(glm::mat4 &projection, glm::mat4 &view) {
+
+	if (displayed) {
+		if (isTransparent()){
+			glDisable(GL_CULL_FACE);
+
+			Bind();
+
+			glBindVertexArray(vao);
+			{
+
+				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_SHORT, 0);
+			}
+			glBindVertexArray(vao);
+			Unbind();
+			glEnable(GL_CULL_FACE); 
+			glCullFace(GL_BACK); 
+		}
+		else{
+			Bind();
+
+			glBindVertexArray(vao);
+			{
+
+				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_SHORT, 0);
+			}
+			glBindVertexArray(vao);
+			Unbind();
+		}
+
+
 
 	}
 }

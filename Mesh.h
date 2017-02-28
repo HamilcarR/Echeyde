@@ -20,27 +20,32 @@ public:
 	Mesh(const Mesh& A); 
 	virtual ~Mesh();
 	virtual void clean();
-	void display(glm::mat4 &projection_matrix, glm::mat4 &model_matrix, glm::mat4 &view); 
+	void display_static(glm::mat4 &projection_matrix,  glm::mat4 &view); 
+	void display_dynamic(glm::mat4 &projection_matrix, glm::mat4 &view);
+
 	bool isTransparent() { return material->isTransparent(); }
 	bool isDisplayed() { return displayed; }
 	uniform_matrix getUniforms(){ return uniforms; }
 	std::shared_ptr<Material> getMaterial(){ return material; }
 	geometry_data getGeometry(){ return data; }
-
+	Transform* getTransform(){ return &transform;  }
+	
 protected:
 	
 	bool textured_model;
 	bool displayed;
 	geometry_data data; 
 	std::shared_ptr<Material> material; 
+	Transform transform; 
 	uniform_matrix uniforms;
 	GLuint vao; 
 	GLuint vbo[vbo_size];
 	Uint16 draw_mode;
 
-private:
 	void Bind();
-	void Unbind(); 
+	void Unbind();
 	void initVAO();
+private:
+	
 };
 

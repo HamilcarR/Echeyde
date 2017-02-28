@@ -28,15 +28,15 @@ public:
 	const std::string getTesselationShader()const{ return tesselation_shader_name; }
 	virtual void clean();
 	virtual void BindMatrices(glm::mat4& projection, glm::mat4& view, glm::mat4& model) const;
-	virtual void BindTextures(GLuint tex_index, const char* uniform_tex);
+	virtual void BindTextures(Echeyde::TEX);
 	const GLuint getUniformProjection()const{ return uniform_projection; }
 	const GLuint getUniformView()const{ return uniform_view; }
 	const GLuint getUniformModel()const{ return uniform_model; }
 protected:
 	void compile_shaders();
 	void create_shaders(); 
-
-	
+	void set_textures_uni(GLuint program);
+	GLuint uniform_textures[Echeyde::TEX_SIZE]; 
 
 	std::string vertex_shader_name; 
 	std::string fragment_shader_name;
@@ -79,6 +79,11 @@ struct ShaderSLightUni{
 	std::vector<GLuint> uni_radius;
 };
 
+struct MaterialUni{
+	GLuint specular_pow; 
+	GLuint specular_expo;
+	GLuint textured;
+};
 class BaseShader :
 	public Shader
 {
@@ -88,14 +93,17 @@ public:
 	BaseShader(std::string &vertex_shader, std::string &fragment_shader, std::string &geometry_shader, std::string &tesselation_shader);
 	BaseShader(std::string &vertex_shader, std::string &fragment_shader);
 	virtual ~BaseShader();
-	
+	virtual void BindMaterials(float pow, float expo, bool textured);
 	virtual void BindLights();
 	
 private:
 	
 	LightArray *lightArray;
+
 	ShaderDLightUni DLight_uni;
 	ShaderPLightUni PLight_uni;
 	ShaderSLightUni SLight_uni;
+
+	MaterialUni material_uni;
 	
 };

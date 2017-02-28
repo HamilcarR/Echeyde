@@ -40,7 +40,7 @@ const int vbo_size = 7;
 const std::string M_PROJECTION = "projection";
 const std::string M_MODEL = "model";
 const std::string M_VIEW = "view";
-static const char* shader_uniforms_texture_names[] = { "diffuse","normal","blendmap","specular","ambiant","height","dudv" };
+
 
 
 
@@ -54,7 +54,9 @@ static const bool DEBUG_DESTRUCTOR = true;
 /*Enums*/
 namespace Echeyde {
 	enum VBO : unsigned { VERTEX = 0, COLOR = 1, NORMAL = 2, TANGENT = 3, TEXTURE = 4,BITANGENT = 5, INDICE = 6   };
-	enum TEX : unsigned { DIFFUSE0 = 0 , NORMAL0 = 1 , OPACITY0=2, BLENDMAP0 = 3 , SPECULAR0 = 4 , AMBIENT0 = 5 , HEIGHT0 = 6 , DUDV0 = 7 , DATA = 8 , OPTIONAL0 = 9 ,OPTIONAL1 = 10};
+	const unsigned int TEX_SIZE = 10;
+
+	enum TEX : unsigned { DIFFUSE0 = 0 , NORMAL0 = 1 , OPACITY0=2, BLENDMAP0 = 3 , SPECULAR0 = 4 , AMBIENT0 = 5 , HEIGHT0 = 6 , DUDV0 = 7 , DATA0 = 8 , OPTIONAL0 = 9};
 	enum LIGHTTYPE : unsigned { DIRECTIONAL = 0, POINT = 1, SPOT = 2 };
 
 }
@@ -192,6 +194,21 @@ public:
 	}
 };
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*******************/
 
 struct textures_data {
@@ -235,6 +252,8 @@ struct uniform_struct {
 	GLuint normal_u;
 
 };
+
+
 /****************************************************************************************************************************************************************************/
 /*basic 3D models*/
 
@@ -288,6 +307,61 @@ namespace echeyde{
 	}
 }
 
+/****************************************************************************************************************************************************************************/
+/**/
+
+
+class Transform{
+
+public:
+
+	
+	Transform(){
+		translation = glm::vec3(0.); 
+		rotation = glm::vec4(0.); 
+		scaling = glm::vec3(1.);
+		model = glm::mat4(1.); 
+	}
+	virtual ~Transform(){
+
+	}
+
+	virtual void translate(glm::vec3 trans){
+		translation = trans;
+		model = glm::translate(translation); 
+	}
+
+	virtual void scale(glm::vec3 scal){
+		scaling = scal;
+		model = glm::scale(scaling);
+	}
+
+	virtual void rotate(float angle, glm::vec3 direction){
+		rotation = glm::vec4(direction, angle); 
+		model = glm::rotate(angle, direction); 
+	}
+
+	virtual glm::vec3 getPosition(){
+		return translation;
+	}
+	virtual glm::vec4 getRotation(){
+		return rotation;
+	}
+	virtual glm::vec3 getScale(){
+		return scaling; 
+	}
+
+	virtual glm::mat4 getModelMatrix(){
+		return model;
+	}
+
+	glm::vec3 translation;
+	glm::vec4 rotation;
+	glm::vec3 scaling;
+
+	glm::mat4 model;
+
+};
 
 
 #endif 

@@ -65,7 +65,7 @@ GLuint Texture::getTexture() {
 void Texture::Bind(Echeyde::TEX tex_index , Shader *shader) {
 	assert(id != 0);
 	assert(shader != nullptr); 
-	shader->BindTextures(tex_index, shader_uniforms_texture_names[tex_index]);
+	shader->BindTextures(tex_index);
 	
 	glActiveTexture(GL_TEXTURE0 + tex_index);
 	glBindTexture(GL_TEXTURE_2D, id);

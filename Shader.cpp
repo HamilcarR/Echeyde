@@ -4,7 +4,16 @@
 
 
 std::mutex file_mutex; 
+static const char* shader_uniforms_texture_names[] = { "diffuse", "normal", "opacity", "blendmap", "specular", "ambiant", "height", "dudv", "data", "optional" };
+static const char* shader_uniforms_specular_names[] = { "spec_power", "spec_exponent" };
+void Shader::set_textures_uni(GLuint program){
+	using namespace Echeyde;
+	for (unsigned int i = 0; i < TEX_SIZE; i++)
+		uniform_textures[i] = glGetUniformLocation(program, shader_uniforms_texture_names[i]);
+	
 
+	
+}
 
 Shader::Shader() {
 	
@@ -21,6 +30,7 @@ Shader::Shader(std::string& v, std::string &f) {
 	uniform_model = glGetUniformLocation(getProgram(), M_MODEL.c_str());
 	uniform_projection = glGetUniformLocation(getProgram(), M_PROJECTION.c_str());
 	uniform_view = glGetUniformLocation(getProgram(), M_VIEW.c_str());
+	set_textures_uni(programID); 
 
 }
 
@@ -34,6 +44,7 @@ Shader::Shader(std::string &v, std::string &f, std::string &g) {
 	uniform_model = glGetUniformLocation(getProgram(), M_MODEL.c_str());
 	uniform_projection = glGetUniformLocation(getProgram(), M_PROJECTION.c_str());
 	uniform_view = glGetUniformLocation(getProgram(), M_VIEW.c_str());
+	set_textures_uni(programID);
 
 }
 Shader::Shader(std::string &v, std::string &f, std::string &g, std::string &t)
@@ -47,7 +58,7 @@ Shader::Shader(std::string &v, std::string &f, std::string &g, std::string &t)
 	uniform_model = glGetUniformLocation(getProgram(), M_MODEL.c_str());
 	uniform_projection = glGetUniformLocation(getProgram(), M_PROJECTION.c_str());
 	uniform_view = glGetUniformLocation(getProgram(), M_VIEW.c_str());
-
+	set_textures_uni(programID);
 
 
 
@@ -242,8 +253,8 @@ void Shader::BindMatrices(glm::mat4 &proj, glm::mat4 &view, glm::mat4 &model) co
 
 }
 
-void Shader::BindTextures(GLuint tex_index , const char* tex_name){
-	glUniform1i(glGetUniformLocation(programID, tex_name), tex_index);
+void Shader::BindTextures( Echeyde::TEX tex_name){
+	glUniform1i(uniform_textures[tex_name], tex_name);
 }
 /*****************************************************************************************************************************************/
 //TODO : Use that later !
@@ -254,40 +265,60 @@ static unsigned int search_light_number(std::string& text){
 	char *c = strtok(arr.data(), "\n"); 
 
 }
+struct uni_lights_array{
+	ShaderPLightUni PLight_uni;
+	ShaderDLightUni DLight_uni;
+	ShaderSLightUni SLight_uni;
+};
 
-BaseShader::BaseShader(std::string &vertex_shader, std::string &fragment_shader, std::string &geometry_shader) : Shader(vertex_shader, fragment_shader, geometry_shader){
+static uni_lights_array get_lights_uni(GLuint program){
+	uni_lights_array uni;
 	for (int i = 0; i < LIGHTS_COUNT_SHADER; i++){
-		GLuint p_uni_pos =glGetUniformLocation(getProgram(), ("pointLights[" + std::to_string(i) + "].position").c_str());
-		GLuint p_uni_col = glGetUniformLocation(getProgram(), ("pointLights[" + std::to_string(i) + "].color").c_str());
-		GLuint p_uni_att = glGetUniformLocation(getProgram(), ("pointLights[" + std::to_string(i) + "].attenuation").c_str());
-		GLuint p_uni_rad = glGetUniformLocation(getProgram(), ("pointLights[" + std::to_string(i) + "].radius").c_str());
-		GLuint p_uni_pow = glGetUniformLocation(getProgram(), ("pointLights[" + std::to_string(i) + "].power").c_str());
-		PLight_uni.uni_positions.push_back(p_uni_pos);
-		PLight_uni.uni_colors.push_back(p_uni_col);
-		PLight_uni.uni_attenuation.push_back(p_uni_att);
-		PLight_uni.uni_radius.push_back(p_uni_rad);
-		PLight_uni.uni_power.push_back(p_uni_pow);
+		GLuint p_uni_pos = glGetUniformLocation(program, ("pointLights[" + std::to_string(i) + "].position").c_str());
+		GLuint p_uni_col = glGetUniformLocation(program, ("pointLights[" + std::to_string(i) + "].color").c_str());
+		GLuint p_uni_att = glGetUniformLocation(program, ("pointLights[" + std::to_string(i) + "].attenuation").c_str());
+		GLuint p_uni_rad = glGetUniformLocation(program, ("pointLights[" + std::to_string(i) + "].radius").c_str());
+		GLuint p_uni_pow = glGetUniformLocation(program, ("pointLights[" + std::to_string(i) + "].power").c_str());
+		uni.PLight_uni.uni_positions.push_back(p_uni_pos);
+		uni.PLight_uni.uni_colors.push_back(p_uni_col);
+		uni.PLight_uni.uni_attenuation.push_back(p_uni_att);
+		uni.PLight_uni.uni_radius.push_back(p_uni_rad);
+		uni.PLight_uni.uni_power.push_back(p_uni_pow);
 
-		GLuint s_uni_pos = glGetUniformLocation(getProgram(), ("spotLights[" + std::to_string(i) + "].position").c_str());
-		GLuint s_uni_col = glGetUniformLocation(getProgram(), ("spotLights[" + std::to_string(i) + "].color").c_str());
-		GLuint s_uni_att = glGetUniformLocation(getProgram(), ("spotLights[" + std::to_string(i) + "].attenuation").c_str());
-		GLuint s_uni_rad = glGetUniformLocation(getProgram(), ("spotLights[" + std::to_string(i) + "].radius").c_str());
-		GLuint s_uni_pow = glGetUniformLocation(getProgram(), ("spotLights[" + std::to_string(i) + "].power").c_str());
-		SLight_uni.uni_positions.push_back(s_uni_pos);
-		SLight_uni.uni_colors.push_back(s_uni_col);
-		SLight_uni.uni_attenuation.push_back(s_uni_att);
-		SLight_uni.uni_radius.push_back(s_uni_rad);
-		SLight_uni.uni_power.push_back(s_uni_pow);
+		GLuint s_uni_pos = glGetUniformLocation(program, ("spotLights[" + std::to_string(i) + "].position").c_str());
+		GLuint s_uni_col = glGetUniformLocation(program, ("spotLights[" + std::to_string(i) + "].color").c_str());
+		GLuint s_uni_att = glGetUniformLocation(program, ("spotLights[" + std::to_string(i) + "].attenuation").c_str());
+		GLuint s_uni_rad = glGetUniformLocation(program, ("spotLights[" + std::to_string(i) + "].radius").c_str());
+		GLuint s_uni_pow = glGetUniformLocation(program, ("spotLights[" + std::to_string(i) + "].power").c_str());
+		uni.SLight_uni.uni_positions.push_back(s_uni_pos);
+		uni.SLight_uni.uni_colors.push_back(s_uni_col);
+		uni.SLight_uni.uni_attenuation.push_back(s_uni_att);
+		uni.SLight_uni.uni_radius.push_back(s_uni_rad);
+		uni.SLight_uni.uni_power.push_back(s_uni_pow);
 
 
-		GLuint d_uni_pos = glGetUniformLocation(getProgram(), ("directLights[" + std::to_string(i) + "].position").c_str());
-		GLuint d_uni_col = glGetUniformLocation(getProgram(), ("directLights[" + std::to_string(i) + "].color").c_str());
-		GLuint d_uni_pow = glGetUniformLocation(getProgram(), ("directLights[" + std::to_string(i) + "].power").c_str());
-		DLight_uni.uni_positions.push_back(d_uni_pos);
-		DLight_uni.uni_colors.push_back(d_uni_col);
-		DLight_uni.uni_power.push_back(d_uni_pow);
+		GLuint d_uni_pos = glGetUniformLocation(program, ("directLights[" + std::to_string(i) + "].position").c_str());
+		GLuint d_uni_col = glGetUniformLocation(program, ("directLights[" + std::to_string(i) + "].color").c_str());
+		GLuint d_uni_pow = glGetUniformLocation(program, ("directLights[" + std::to_string(i) + "].power").c_str());
+		uni.DLight_uni.uni_positions.push_back(d_uni_pos);
+		uni.DLight_uni.uni_colors.push_back(d_uni_col);
+		uni.DLight_uni.uni_power.push_back(d_uni_pow);
 
 	}
+	return uni;
+}
+
+
+
+
+BaseShader::BaseShader(std::string &vertex_shader, std::string &fragment_shader, std::string &geometry_shader) : Shader(vertex_shader, fragment_shader, geometry_shader){
+	uni_lights_array uni = get_lights_uni(getProgram()); 
+	SLight_uni = uni.SLight_uni;
+	DLight_uni = uni.DLight_uni;
+	PLight_uni = uni.PLight_uni;
+	material_uni.specular_expo = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[1]); 
+	material_uni.specular_pow = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[0]); 
+	material_uni.textured = glGetUniformLocation(getProgram(), "isTextured"); 
 
 }
 
@@ -348,7 +379,12 @@ void BaseShader::BindLights(){
 }
 /*****************************************************************************************************************************************/
 
+void BaseShader::BindMaterials(float pow, float exp,bool textured){
+	glUniform1f(material_uni.specular_expo, exp);
+	glUniform1f(material_uni.specular_pow, pow); 
+	glUniform1i(material_uni.textured, (textured == true) ? 1 : 0);
 
+}
 
 
 

@@ -9,7 +9,8 @@ namespace Echeyde {
 		class Importer
 		{
 		public:
-			static std::vector<object_data> load_model(std::string& file);
+			static std::vector<object_data> load_model(std::string& file, bool transparency);
+			static material_data getMaterial(std::string& file , bool transparency); 
 		};
 
 	}
