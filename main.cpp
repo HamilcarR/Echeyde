@@ -18,7 +18,7 @@ int main(int arg_number, char** arg) {
 	SDL_Event event;
 	KInputs main_loop(event);
 	Echeyde::Scene scene; 
-	Window window("window", WIDTH, HEIGHT,main_loop,scene); 
+	Window window("window", 1000, 800, main_loop, scene);
 	
 	window.Loop(); 
 

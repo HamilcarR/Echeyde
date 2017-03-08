@@ -35,7 +35,7 @@ Texture::Texture(std::string& filename)
 			glGenerateMipmap(GL_TEXTURE_2D);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -3.0);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_LOD_BIAS, -3);
 			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	
@@ -126,6 +126,8 @@ TextureGroup::TextureGroup(material_data& mat) {
 		if (!mat.opacity_empty())	opacity_textures = instance->addOrReturn(mat.textures.opacity);
 		if (!mat.distortion_empty()) distortion_textures = instance->addOrReturn(mat.textures.distortion);
 		if (!mat.optional_empty())	optional_textures = instance->addOrReturn(mat.textures.optional);
+		if (!mat.blend_empty())	blend_textures = instance->addOrReturn(mat.textures.blend);
+
 		Mdata = mat; 
 		
 	}
@@ -197,6 +199,8 @@ bool TextureGroup::operator==(TextureGroup &A) const{
 /************************************************************************************/
 
 void TextureGroup::bindFirst(Shader* shader) {
+	if (blend_textures != nullptr && blend_textures->isInitialized()) blend_textures->Bind(Echeyde::BLENDMAP0, shader);
+
 	if (diffuse_textures != nullptr && diffuse_textures->isInitialized()) diffuse_textures->Bind(Echeyde::DIFFUSE0, shader);
 	
 	if (normal_textures != nullptr && normal_textures->isInitialized()) normal_textures->Bind(Echeyde::NORMAL0, shader);
@@ -207,7 +211,7 @@ void TextureGroup::bindFirst(Shader* shader) {
 
 	if (optional_textures != nullptr && optional_textures->isInitialized()) optional_textures->Bind(Echeyde::OPTIONAL0, shader);
 
-	if (blend_textures != nullptr && blend_textures->isInitialized()) blend_textures->Bind(Echeyde::BLENDMAP0, shader);
+	
 
 }
 	

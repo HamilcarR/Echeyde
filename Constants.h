@@ -29,12 +29,12 @@ class Texture;
 const std::string SHADER_LOCATION = "shaders/";
 const std::string RESSOURCES_LOCATION = "res/";
 const std::string TEXTURES_LOCATION = RESSOURCES_LOCATION + "textures/";
-
+const std::string HEIGHTMAPS_LOCATION = TEXTURES_LOCATION + "heightmaps/"; 
 
 /****************************************************************************************************************************************************************************/
 /*Constants*/
-const uint16_t WIDTH = 800; 
-const uint16_t HEIGHT = 800; 
+const uint16_t WIDTH = 900; 
+const uint16_t HEIGHT = 900; 
 const uint16_t EVENT_ARRAY_SIZE = 10; 
 const int vbo_size = 7; 
 const std::string M_PROJECTION = "projection";
@@ -75,7 +75,7 @@ struct vertex_data {
 struct geometry_data {
 public:
 	std::vector<float> vertex;
-	std::vector<unsigned short> indices; 
+	std::vector<unsigned int> indices; 
 	std::vector<float> texture;
 	std::vector<float> normal; 
 	std::vector<float> tangent; 
@@ -165,7 +165,7 @@ public:
 		}
 		file_o << "Indices :\n";
 		rap = 1;
-		for (float m : indices) {
+		for (unsigned long m : indices) {
 			file_o << std::to_string(m) << ((rap % 3 == 0 ) ? "\n" : "    ");
 			rap++;
 		}
@@ -210,11 +210,17 @@ public:
 
 
 /*******************/
+struct texture_uniforms{
+	std::string uniform; 
+	GLuint programID; 
+};
+
 
 struct textures_data {
 	std::string diffuse;
 	std::string normal;
 	std::string opacity;
+	std::string blend;
 	std::string distortion;
 	std::string optional;
 };
@@ -234,6 +240,7 @@ struct material_data {
 	bool opacity_empty() { return (textures.opacity.empty()) ; }
 	bool distortion_empty() { return (textures.distortion.empty()); }
 	bool optional_empty() { return (textures.optional.empty()) ; }
+	bool blend_empty() { return (textures.blend.empty()); }
 };
 
 /*******************/

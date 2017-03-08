@@ -4,7 +4,7 @@
 
 
 std::mutex file_mutex; 
-static const char* shader_uniforms_texture_names[] = { "diffuse", "normal", "opacity", "blendmap", "specular", "ambiant", "height", "dudv", "data", "optional" };
+static const char* shader_uniforms_texture_names[] = { "diffuse", "normal", "opacity", "blendMap", "specular", "ambiant", "height", "dudv", "data", "optional" };
 static const char* shader_uniforms_specular_names[] = { "spec_power", "spec_exponent" };
 void Shader::set_textures_uni(GLuint program){
 	using namespace Echeyde;

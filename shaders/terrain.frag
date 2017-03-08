@@ -1,16 +1,13 @@
-#version 450 compatibility
-#define MAX_LIGHTS 10
+#version 450 compatibility 
+#define MAX_LIGHTS 10  
 
-in vec3 Icolor;
 in vec2 Itex;
 in vec3 Ito_pointLights[MAX_LIGHTS];
 in vec3 Ito_directionalLights[MAX_LIGHTS];
 in vec3 Ito_spotLights[MAX_LIGHTS];
-in vec3 fragPos;
-in vec3 camPosition;
+in vec2 nTex; 
 in vec3 Inorm;
-in mat3 tangmat; 
-in mat4 model; 
+in vec3 fragPos; 
 out vec4 color; 
 
 
@@ -46,7 +43,10 @@ uniform unsigned int directional_lights_size;
 uniform unsigned int point_lights_size; 
 uniform unsigned int spot_lights_size; 
 uniform sampler2D diffuse;
+uniform sampler2D optional; 
 uniform sampler2D normal;
+uniform sampler2D opacity;
+uniform sampler2D blendMap;
 uniform float spec_exponent ; 
 uniform float spec_power ;
 uniform int isTextured ;
@@ -74,7 +74,6 @@ struct LightResult{
 
 
 LightResult computeDirectionalLights(vec3 Inor){
-	vec3 toEye =normalize((camPosition - fragPos)) ; 
 	LightResult result;
 	result.diffuse = vec3(0.); 
 	result.specular = vec3(0.); 
@@ -86,15 +85,8 @@ LightResult computeDirectionalLights(vec3 Inor){
 		vec3 color = directLights[i].color; 
 		vec3 position = directLights[i].position;
 		vec3 to_light = normalize(position); 
-		float dist = length(position - fragPos);
 		float light_variation = max(dot( to_light,normalized_normals ) , 0.0 ) ;
 		result.diffuse += power * light_variation * color;
-
-		vec3 reflected_light = reflect(-to_light,normalized_normals);
-		float specular_variation = max(dot(toEye , reflected_light) , 0. ) ; 
-		float spec_result = pow(specular_variation , spec_exponent) ; 
-		result.specular += spec_power * spec_result * color;
-
 	}
 	return result;
 
@@ -102,7 +94,6 @@ LightResult computeDirectionalLights(vec3 Inor){
 
 
 LightResult computePointLights(vec3 Inor){
-	vec3 toEye =normalize((camPosition - fragPos)) ; 
 	LightResult result;
 	result.diffuse = vec3(0.); 
 	result.specular = vec3(0.); 
@@ -116,14 +107,9 @@ LightResult computePointLights(vec3 Inor){
 		float radius = pointLights[i].radius;
 		vec3 position = pointLights[i].position;
 		vec3 to_light = normalize( ( position - fragPos)); 
-		float dist = length((to_light));
+		float dist = length(to_light); 
 		float attenuation_calculated = attenuation.x + attenuation.y*dist + attenuation.z*dist*dist;
 		float light_variation = max(dot( to_light,normalized_normals ) , 0.0 ) ;
-
-		vec3 reflected_light = reflect(-to_light,normalized_normals);
-		float specular_variation = max(dot(toEye , reflected_light) , 0. ) ; 
-		float spec_result = pow(specular_variation , spec_exponent) ; 
-		result.specular += spec_power * spec_result * color;
 		result.diffuse += power * light_variation * color /attenuation_calculated;
 
 	}
@@ -131,24 +117,30 @@ LightResult computePointLights(vec3 Inor){
 	return result;
 }
 
+vec4 blend(){
+	
+	vec4 blendmap = texture2D(opacity , nTex); 
+	float backTexAmount = 1 - (blendmap.r + blendmap.g + blendmap.b) ; 
+	vec2 tiled = nTex * 50. ; 
+	vec4 a = texture2D(diffuse , tiled) * blendmap.r; 
+	vec4 b = texture2D(optional , tiled) * blendmap.g ; 
+	vec4 c = texture2D(normal , tiled) * blendmap.b  ; 
+	vec4 d = texture2D(blendMap, tiled) * backTexAmount;
+	return a+b+c+d ; 
 
+}
 
 
 void main(){
-if(isTextured == 1){
-	vec3 nmap_normales=transpose(tangmat)*(normalize(2*texture2D(normal,Itex)-1)).rgb ;
-	 
+
+	vec3 nmap_normales= normalize ( Inorm ) ; 
 	LightResult P = computePointLights(nmap_normales) ; 
 	LightResult D = computeDirectionalLights(nmap_normales) ; 
 
 	vec4 Plight = vec4(P.diffuse,0.);
-	vec4 Pspec = vec4(P.specular,0.); 
 	vec4 Dlight = vec4(D.diffuse,0.); 
-	vec4 Dspec = vec4(D.specular,0.);
 
-	color = texture2D(diffuse,Itex)*(Plight+Dlight) + (Pspec+Dspec);
-	}
-	else
-	   color = vec4(1.); 
+	color = blend()*(Plight+Dlight);
+	
 
 }

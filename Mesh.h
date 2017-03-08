@@ -22,7 +22,7 @@ public:
 	virtual void clean();
 	void display_static(glm::mat4 &projection_matrix,  glm::mat4 &view); 
 	void display_dynamic(glm::mat4 &projection_matrix, glm::mat4 &view);
-
+	void addTexture(Echeyde::TEX texture_type, std::string& file, std::string& shader_variable_name); 
 	bool isTransparent() { return material->isTransparent(); }
 	bool isDisplayed() { return displayed; }
 	uniform_matrix getUniforms(){ return uniforms; }

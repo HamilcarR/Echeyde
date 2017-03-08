@@ -57,8 +57,8 @@ void Window::Loop() {
 	std::vector<object_data> st;
 	std::vector<object_data> si;
 	try {
-		st = Echeyde::FILEIO::Importer::load_model(std::string("cube.obj"),false);
-		si = Echeyde::FILEIO::Importer::load_model(std::string("sphere.obj"),false);
+	//	st = Echeyde::FILEIO::Importer::load_model(std::string("cube.obj"),false);
+	//	si = Echeyde::FILEIO::Importer::load_model(std::string("sphere.obj"),false);
 	}
 	catch (const File_not_found &e) {
 		std::cout << e.what() << std::endl;
@@ -73,53 +73,70 @@ void Window::Loop() {
 	Renderer *renderer = Renderer::getInstance();
 	LightArray *instance = LightArray::getInstance();
 
-	glm::mat4 projection = glm::perspective(75.f, float(HEIGHT/WIDTH), 0.001f, 1000.f); 
+	glm::mat4 projection = glm::perspective(100.f, float(HEIGHT/WIDTH), 0.1f, 500.f); 
 	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)); 
 	glm::mat4 model = glm::scale(glm::vec3(5, 5, 5)); //glm::mat4(1.);
 	
 	//renderer->addDynamicMeshes(st,shader, true);
-	GameObject object = GameObject(st, shader, true, true);
-	GameObject obj2 = GameObject(si, shader, true, false);
+	//GameObject object = GameObject(st, shader, false, true);
+	//GameObject obj2 = GameObject(si, shader, false, false);
 	shader_light_data data;
 		
 
-		data.base.position = glm::vec3(3, 7, 0);
+		data.base.position = glm::vec3(10, 2, 3);
 		data.attenuation = glm::vec3(1, 10, 100);
 		data.radius = 100.f;
 		data.base.colour = glm::vec3(0.1, 0.4, 0.6);
-		data.base.power = 100.F;
-		instance->addLight(new PointLight(data.base, data.radius, data.attenuation));
-
-
-		data.base.position = glm::vec3(3, -7, 0);
-		data.attenuation = glm::vec3(1, 100, 10);
-		data.radius = 100.f;
-		data.base.colour = glm::vec3(0.1, 0.5, 0.1);
 		data.base.power = 50.F;
 		instance->addLight(new PointLight(data.base, data.radius, data.attenuation));
 
-		data.base.position = glm::vec3(10, -7, 3);
-		data.attenuation = glm::vec3(1, 10, 10);
+
+		data.base.position = glm::vec3(300, 600, 2);
+		data.base.colour = glm::vec3(0.7, 0.5, 0.4);
+		data.base.power = 1.F;
+		instance->addLight(new DirectionalLight(data.base));
+
+
+		data.base.position = glm::vec3(10, 30, 2);
+		data.attenuation = glm::vec3(1, 100, 10);
 		data.radius = 100.f;
-		data.base.colour = glm::vec3(0.6, 0.3, 0.1);
-		data.base.power = 70.F;
+		data.base.colour = glm::vec3(0.1, 0.3, 0.3);
+		data.base.power = 50.F;
+		instance->addLight(new PointLight(data.base, data.radius, data.attenuation));
+
+		data.base.position = glm::vec3(300, 10, 30);
+		data.attenuation = glm::vec3(1, 10, 100);
+		data.radius = 100.f;
+		data.base.colour = glm::vec3(0.6, 0.4, 0.3);
+		data.base.power = 100.F;
 		instance->addLight(new PointLight(data.base, data.radius, data.attenuation));
 
 		
-		geometry_data terrain_geometry = TerrainGenerator::generateTerrain(200);
-		material_data mat_data = Echeyde::FILEIO::Importer::getMaterial(std::string("terrain.obj") , true);
+		geometry_data terrain_geometry = TerrainGenerator::generateTerrain((HEIGHTMAPS_LOCATION+"heightmap.png").c_str());
+		material_data mat_data ;
 		object_data terrain_obj;
-		terrain_obj.data = terrain_geometry; 
+		mat_data.transparency = false; 
+		terrain_obj.data = terrain_geometry;
+		mat_data.textures.diffuse = TEXTURES_LOCATION + "/ground" + "/dirt" + "/dirt_01.png";
+		mat_data.textures.opacity = TEXTURES_LOCATION + "/blendmaps" + "/blend.png";
+		mat_data.textures.normal = TEXTURES_LOCATION + "/ground" + "/gravel_01.png";
+		mat_data.textures.optional = TEXTURES_LOCATION + "/ground" + "/snow" + "/snow_1.png";
+		mat_data.textures.blend = TEXTURES_LOCATION + "/ground" + "/grass" + "/grass_02.png";
+		
 		terrain_obj.material = mat_data; 
 		std::vector<object_data> ob; 
 		ob.push_back(terrain_obj); 
 		GameObject terrain = GameObject(ob, terrain_shader, true, true);
-		terrain.translate(glm::vec3(-100, 0, -100));
 	
-	//renderer->addStaticMeshes(st, shader, true); 
+
+
+
+
+
+	
 
 	SDL_Event event; 
-	std::unique_ptr<Camera> user_camera = std::unique_ptr<Camera>(new Camera(1.f, 1.f, glm::vec3(0, 1, 0), 75.f, float(HEIGHT / WIDTH), 0.001f, 1000.f)); 
+	std::unique_ptr<Camera> user_camera = std::unique_ptr<Camera>(new Camera(1.f, 1.f, glm::vec3(0, 1, 0), 100.f, float(HEIGHT / WIDTH), 0.1f, 1000.f)); 
 	float i = 0; 
 
 	while (loop) {
@@ -131,14 +148,15 @@ void Window::Loop() {
 				loop= false;
 			user_camera->Move(event);
 			if (event.key.keysym.sym == SDLK_KP_8)
-				i++;
+				i+=1.5f;
 			if (event.key.keysym.sym == SDLK_KP_2)
-				i--;
+				i-=1.5f;
 				
 		}
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		obj2.translate(glm::vec3(i,0,0));
-
+	
+		
+		instance->getLightArray()[3]->setPosition(glm::vec3(300 , i , 300)); 
 		renderer->renderAll(user_camera->getProjectionMatrix(), user_camera->getViewMatrix()); 
 	
 		SDL_GL_SwapWindow(window); 

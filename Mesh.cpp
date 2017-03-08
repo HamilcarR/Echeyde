@@ -104,7 +104,7 @@ void Mesh::initVAO() {
 
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[Echeyde::INDICE]);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.indices.size() * sizeof(GLushort), data.indices.data(), draw_mode);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.indices.size() * sizeof(GLuint), data.indices.data(), draw_mode);
 }
 
 
@@ -169,7 +169,7 @@ void Mesh::display_dynamic(glm::mat4 &projection, glm::mat4 &view) {
 			glBindVertexArray(vao);
 			{
 
-				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_SHORT, 0);
+				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_INT, 0);
 			}
 			glBindVertexArray(vao);
 			Unbind();
@@ -182,7 +182,7 @@ void Mesh::display_dynamic(glm::mat4 &projection, glm::mat4 &view) {
 			glBindVertexArray(vao);
 			{
 
-				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_SHORT, 0);
+				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_INT, 0);
 			}
 			glBindVertexArray(vao);
 			Unbind();
@@ -205,7 +205,7 @@ void Mesh::display_static(glm::mat4 &projection, glm::mat4 &view) {
 			glBindVertexArray(vao);
 			{
 
-				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_SHORT, 0);
+				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_INT, 0);
 			}
 			glBindVertexArray(vao);
 			Unbind();
@@ -218,7 +218,7 @@ void Mesh::display_static(glm::mat4 &projection, glm::mat4 &view) {
 			glBindVertexArray(vao);
 			{
 
-				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_SHORT, 0);
+				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_INT, 0);
 			}
 			glBindVertexArray(vao);
 			Unbind();
@@ -229,4 +229,8 @@ void Mesh::display_static(glm::mat4 &projection, glm::mat4 &view) {
 	}
 }
 
+/**************************************************************************************************************************/
 
+void Mesh::addTexture(Echeyde::TEX type, std::string& file, std::string& shader_variable_name){
+
+}
