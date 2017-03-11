@@ -47,6 +47,7 @@ uniform sampler2D optional;
 uniform sampler2D normal;
 uniform sampler2D opacity;
 uniform sampler2D blendMap;
+uniform sampler2D shadowmap;
 uniform float spec_exponent ; 
 uniform float spec_power ;
 uniform int isTextured ;

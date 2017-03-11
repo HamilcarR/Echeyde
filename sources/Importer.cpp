@@ -87,9 +87,9 @@ namespace Echeyde {
 				mesh.data.texture.push_back(textures[i].y);
 			}
 			for (unsigned int i = 0; i < scene->mMeshes[mesh_index]->mNumFaces; i++) {
-				mesh.data.indices.push_back(static_cast<unsigned short>(index[i].mIndices[0]));
-				mesh.data.indices.push_back(static_cast<unsigned short>(index[i].mIndices[1]));
-				mesh.data.indices.push_back(static_cast<unsigned short>(index[i].mIndices[2]));
+				mesh.data.indices.push_back(static_cast<unsigned int>(index[i].mIndices[0]));
+				mesh.data.indices.push_back(static_cast<unsigned int>(index[i].mIndices[1]));
+				mesh.data.indices.push_back(static_cast<unsigned int>(index[i].mIndices[2]));
 			}
 			return mesh;
 		}

@@ -173,10 +173,11 @@ void Mesh::display_dynamic(glm::mat4 &projection, glm::mat4 &view) {
 			}
 			glBindVertexArray(vao);
 			Unbind();
-			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
+			
 		}
 		else{
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
 			Bind();
 
 			glBindVertexArray(vao);
@@ -209,10 +210,11 @@ void Mesh::display_static(glm::mat4 &projection, glm::mat4 &view) {
 			}
 			glBindVertexArray(vao);
 			Unbind();
-			glEnable(GL_CULL_FACE); 
-			glCullFace(GL_BACK); 
+			
 		}
 		else{
+			glEnable(GL_CULL_FACE);
+			glCullFace(GL_BACK);
 			Bind();
 
 			glBindVertexArray(vao);

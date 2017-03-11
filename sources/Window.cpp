@@ -57,8 +57,8 @@ void Window::Loop() {
 	std::vector<object_data> st;
 	std::vector<object_data> si;
 	try {
-	//	st = Echeyde::FILEIO::Importer::load_model(std::string("cube.obj"),false);
-	//	si = Echeyde::FILEIO::Importer::load_model(std::string("sphere.obj"),false);
+	st = Echeyde::FILEIO::Importer::load_model(std::string("cube.obj"),true);
+    si = Echeyde::FILEIO::Importer::load_model(std::string("sphere.obj"),false);
 	}
 	catch (const File_not_found &e) {
 		std::cout << e.what() << std::endl;
@@ -71,45 +71,43 @@ void Window::Loop() {
 	}
 	
 	Renderer *renderer = Renderer::getInstance();
-	LightArray *instance = LightArray::getInstance();
+	LightArray *lights = LightArray::getInstance();
 
-	glm::mat4 projection = glm::perspective(100.f, float(HEIGHT/WIDTH), 0.1f, 500.f); 
-	glm::mat4 view = glm::lookAt(glm::vec3(0, 0, 0), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0)); 
-	glm::mat4 model = glm::scale(glm::vec3(5, 5, 5)); //glm::mat4(1.);
 	
-	//renderer->addDynamicMeshes(st,shader, true);
-	//GameObject object = GameObject(st, shader, false, true);
-	//GameObject obj2 = GameObject(si, shader, false, false);
+	GameObject cube = GameObject(st, shader, true, false);
+	GameObject obj2 = GameObject(si, shader, true, false);
 	shader_light_data data;
 		
-
+		
+		cube.scale(glm::vec3(10, 10, 10)); 
+		cube.translate(glm::vec3(10, 10, 10));
 		data.base.position = glm::vec3(10, 2, 3);
 		data.attenuation = glm::vec3(1, 10, 100);
 		data.radius = 100.f;
 		data.base.colour = glm::vec3(0.1, 0.4, 0.6);
 		data.base.power = 50.F;
-		instance->addLight(new PointLight(data.base, data.radius, data.attenuation));
+		lights->addLight(new PointLight(data.base, data.radius, data.attenuation));
 
 
 		data.base.position = glm::vec3(300, 600, 2);
 		data.base.colour = glm::vec3(0.7, 0.5, 0.4);
 		data.base.power = 1.F;
-		instance->addLight(new DirectionalLight(data.base));
+		lights->addLight(new DirectionalLight(data.base));
 
 
-		data.base.position = glm::vec3(10, 30, 2);
+		data.base.position = glm::vec3(181, 30, 200);
 		data.attenuation = glm::vec3(1, 100, 10);
 		data.radius = 100.f;
-		data.base.colour = glm::vec3(0.6, 0.3, 0.3);
+		data.base.colour = glm::vec3(0.6, 0.5, 0.3);
 		data.base.power = 60.F;
-		instance->addLight(new PointLight(data.base, data.radius, data.attenuation));
+		lights->addLight(new PointLight(data.base, data.radius, data.attenuation));
 
 		data.base.position = glm::vec3(300, 10, 30);
 		data.attenuation = glm::vec3(1, 10, 100);
 		data.radius = 100.f;
 		data.base.colour = glm::vec3(0.6, 0.4, 0.3);
 		data.base.power = 100.F;
-		instance->addLight(new PointLight(data.base, data.radius, data.attenuation));
+		lights->addLight(new PointLight(data.base, data.radius, data.attenuation));
 
 
 		geometry_data terrain_geometry = TerrainGenerator::generateTerrain((HEIGHTMAPS_LOCATION+"heightmap.png").c_str());
@@ -137,34 +135,40 @@ void Window::Loop() {
 	std::unique_ptr<Camera> user_camera = std::unique_ptr<Camera>(new Camera(5.f, 5.f, glm::vec3(0, 1, 0), 100.f, float(WIDTH / HEIGHT), 0.1f, 5000.f));
 
 	SDL_Event event; 
-	float i = 0; 
+	float i = 0 , j = 0; 
 
 	while (loop) {
+		DirectionalLight *P = dynamic_cast<DirectionalLight*>(lights->getLightArray()[1]);
 		while (SDL_PollEvent(&event)) {
-
+			
 			if (event.type == SDL_QUIT)
 				loop = false;
 			if (event.key.keysym.sym == SDLK_ESCAPE)
 				loop= false;
 			user_camera->Move(event);
 			if (event.key.keysym.sym == SDLK_KP_8)
-				i+=1.5f;
+				i+=0.001f;
 			if (event.key.keysym.sym == SDLK_KP_2)
 				i-=1.5f;
-				
+			if (event.key.keysym.sym == SDLK_KP_4)
+				j += 1.5f;
+			if (event.key.keysym.sym == SDLK_KP_6)
+				j -= 1.5f;
+			
+	//		std::cout << P->getPosition().x << "   " << P->getPosition().y << "   " << P->getPosition().z << std::endl;
+
 		}
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-		glm::vec3 campos = user_camera->getPosition();  
-		std::cout << campos.x << "   " << campos.y << "   " << campos.z << "   " << std::endl; 
-		instance->getLightArray()[2]->setPosition(campos); 
+		
+	//	P->setRotation(0.001, glm::vec3(0, 0, 0));
+		
 		renderer->renderAll(user_camera->getProjectionMatrix(), user_camera->getViewMatrix()); 
-	
 		SDL_GL_SwapWindow(window); 
 	}
 	TextureArray::clean();
 	renderer->destroy();
-	instance->clean(); 
+	lights->clean();
 	delete shader;
 	delete terrain_shader; 
 

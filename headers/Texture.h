@@ -37,7 +37,7 @@ public:
 	const std::shared_ptr<Texture> getDistortion_textures() const { return distortion_textures; }
 	const std::shared_ptr<Texture> getOptional_textures() const { return optional_textures; }
 	const std::shared_ptr<Texture> getBlend_textures() const { return blend_textures; }
-
+	const std::shared_ptr<Texture> getShadowmap_textures() const { return shadowmap_textures; }
 	bool operator==(TextureGroup &A) const;
 	bool operator<(const TextureGroup &A) const; 
 	void bindFirst(Shader* shader);
@@ -53,7 +53,7 @@ private:
 	std::shared_ptr<Texture> blend_textures;
 	std::shared_ptr<Texture> distortion_textures;
 	std::shared_ptr<Texture> optional_textures;
-
+	std::shared_ptr<Texture> shadowmap_textures;
 	
 };
 

@@ -12,6 +12,7 @@
 #include <glm\common.hpp>
 #include <glm\gtc\type_ptr.hpp>
 #include <glm\gtx\transform.hpp>
+#include <glm\gtx\rotate_vector.hpp>
 #include <cinttypes>
 #include <thread>
 #include <future>
@@ -56,7 +57,7 @@ namespace Echeyde {
 	enum VBO : unsigned { VERTEX = 0, COLOR = 1, NORMAL = 2, TANGENT = 3, TEXTURE = 4,BITANGENT = 5, INDICE = 6   };
 	const unsigned int TEX_SIZE = 10;
 
-	enum TEX : unsigned { DIFFUSE0 = 0 , NORMAL0 = 1 , OPACITY0=2, BLENDMAP0 = 3 , SPECULAR0 = 4 , AMBIENT0 = 5 , HEIGHT0 = 6 , DUDV0 = 7 , DATA0 = 8 , OPTIONAL0 = 9};
+	enum TEX : unsigned { DIFFUSE0 = 0 , NORMAL0 = 1 , OPACITY0=2, BLENDMAP0 = 3 , SPECULAR0 = 4 , AMBIENT0 = 5 , HEIGHT0 = 6 , DUDV0 = 7 , DATA0 = 8 , OPTIONAL0 = 9 , SHADOWMAP0=10};
 	enum LIGHTTYPE : unsigned { DIRECTIONAL = 0, POINT = 1, SPOT = 2 };
 
 }
@@ -223,6 +224,7 @@ struct textures_data {
 	std::string blend;
 	std::string distortion;
 	std::string optional;
+	std::string shadowmap; 
 };
 
 struct material_data {
@@ -234,7 +236,7 @@ struct material_data {
 	glm::vec3 specular_color;
 	textures_data textures;
 	
-
+	bool shadowmap_empty(){ return textures.shadowmap.empty();  }
 	bool diffuse_empty() { return textures.diffuse.empty(); }
 	bool normal_empty() { return textures.normal.empty(); }
 	bool opacity_empty() { return (textures.opacity.empty()) ; }

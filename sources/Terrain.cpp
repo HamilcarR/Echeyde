@@ -17,7 +17,6 @@ struct image_data{
 	unsigned int size; 
 };
 const float MAX_TERRAIN_HEIGHT = 50.f;
-const int MAX_COLOR = 256 * 256 * 256; 
 
 static float compute_height(const unsigned int x, const unsigned int y,const image_data image ){
 	if (x < 0 || x >= image.size || y < 0 || y >= image.size)

@@ -4,7 +4,7 @@
 
 
 std::mutex file_mutex; 
-static const char* shader_uniforms_texture_names[] = { "diffuse", "normal", "opacity", "blendMap", "specular", "ambiant", "height", "dudv", "data", "optional" };
+static const char* shader_uniforms_texture_names[] = { "diffuse", "normal", "opacity", "blendMap", "specular", "ambiant", "height", "dudv", "data", "optional","shadowmap" };
 static const char* shader_uniforms_specular_names[] = { "spec_power", "spec_exponent" };
 void Shader::set_textures_uni(GLuint program){
 	using namespace Echeyde;
@@ -256,6 +256,25 @@ void Shader::BindMatrices(glm::mat4 &proj, glm::mat4 &view, glm::mat4 &model) co
 void Shader::BindTextures( Echeyde::TEX tex_name){
 	glUniform1i(uniform_textures[tex_name], tex_name);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*****************************************************************************************************************************************/
 //TODO : Use that later !
 /*search the variable MAX_LIGHTS in fragment shaders and returns it*/
@@ -415,4 +434,6 @@ void BaseShader::BindMaterials(float pow, float exp,bool textured){
 
 
 /*****************************************************************************************************************************************/
+
+
 

@@ -34,6 +34,7 @@ public:
 	Light(base_light_data& A); 
 	virtual ~Light() = 0; 
 	virtual void setPostion(glm::vec3 position){ this->position = position; };
+	virtual void setRotation(float angle, glm::vec3 target){ glm::vec3 var = target-position; setPosition(glm::rotateX(position, angle)); }
 	virtual void setPower(float power){this->power = power;};
 	virtual base_light_data getBaseData(){ return base_light_data(colour, position, power); };
 	virtual shader_light_data getLightInfo () =0; 
@@ -45,6 +46,7 @@ public:
 
 protected:
 	glm::vec3 colour;
+	glm::mat4 model_matrix; //todo 
 	glm::vec3 position; 
 	float power; 
 };
@@ -58,7 +60,7 @@ public :
 	virtual ~PointLight();
 	virtual glm::vec3 getAttenuation(){ return attenuation; }
 	virtual float getRadius(){ return radius; }
-	virtual void setAttenuatio(glm::vec3 attenuation){this->attenuation = attenuation;};
+	virtual void setAttenuation(glm::vec3 attenuation){this->attenuation = attenuation;};
 	virtual void setRadius(float radius) { this->radius = radius; };
 	virtual shader_light_data getLightInfo();
 protected :

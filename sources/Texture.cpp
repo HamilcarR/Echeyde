@@ -108,6 +108,7 @@ TextureGroup::TextureGroup() {
 	opacity_textures = std::shared_ptr<Texture>(new Texture());
 	distortion_textures = std::shared_ptr<Texture>(new Texture());
 	optional_textures = std::shared_ptr<Texture>(new Texture());
+	shadowmap_textures = std::shared_ptr<Texture>(new Texture());
 }
 /************************************************************************************/
 TextureGroup::TextureGroup(material_data& mat) {
@@ -118,6 +119,7 @@ TextureGroup::TextureGroup(material_data& mat) {
 	distortion_textures = std::shared_ptr<Texture>(new Texture());
 	optional_textures = std::shared_ptr<Texture>(new Texture());
 	blend_textures = std::shared_ptr<Texture>(new Texture());
+	shadowmap_textures = std::shared_ptr<Texture>(new Texture()); 
 	try {
 		
 			
@@ -127,7 +129,7 @@ TextureGroup::TextureGroup(material_data& mat) {
 		if (!mat.distortion_empty()) distortion_textures = instance->addOrReturn(mat.textures.distortion);
 		if (!mat.optional_empty())	optional_textures = instance->addOrReturn(mat.textures.optional);
 		if (!mat.blend_empty())	blend_textures = instance->addOrReturn(mat.textures.blend);
-
+		if (!mat.shadowmap_empty()) shadowmap_textures = instance->addOrReturn(mat.textures.shadowmap); 
 		Mdata = mat; 
 		
 	}
@@ -154,16 +156,17 @@ void TextureGroup::clean(){
 	if (blend_textures != nullptr) blend_textures->clean();
 	if (distortion_textures != nullptr) distortion_textures->clean();
 	if (optional_textures != nullptr) optional_textures->clean();
+	if (shadowmap_textures != nullptr) shadowmap_textures->clean();
 }
 
 /************************************************************************************/
 bool TextureGroup::isInitialized() {/*check null*/
-	if (diffuse_textures == nullptr && normal_textures == nullptr && opacity_textures == nullptr && distortion_textures == nullptr && optional_textures == nullptr && blend_textures == nullptr)
+	if (diffuse_textures == nullptr && shadowmap_textures == nullptr && normal_textures == nullptr && opacity_textures == nullptr && distortion_textures == nullptr && optional_textures == nullptr && blend_textures == nullptr)
 		return false;
 	else {
 		if (diffuse_textures != nullptr && diffuse_textures->isInitialized() || normal_textures != nullptr && normal_textures->isInitialized()
 			|| opacity_textures != nullptr && opacity_textures->isInitialized() || distortion_textures != nullptr && distortion_textures->isInitialized()
-			|| optional_textures != nullptr && optional_textures->isInitialized() || blend_textures != nullptr && blend_textures->isInitialized())
+			|| optional_textures != nullptr && optional_textures->isInitialized() || blend_textures != nullptr && blend_textures->isInitialized() || shadowmap_textures != nullptr && shadowmap_textures->isInitialized())
 			return true;
 		else
 			return false;
@@ -178,8 +181,8 @@ bool TextureGroup::operator<(const TextureGroup &A) const{
 	bool optional = optional_textures < A.getOptional_textures(); 
 	bool blend = blend_textures < A.getBlend_textures(); 
 	bool disto = distortion_textures < A.getDistortion_textures();
-
-	return diffuse && normal && opacity && optional && blend && disto; 
+	bool shadowmap = shadowmap_textures < A.getShadowmap_textures(); 
+	return diffuse && normal && opacity && optional && blend && disto && shadowmap; 
 
 }
 /************************************************************************************/
@@ -190,7 +193,9 @@ bool TextureGroup::operator==(TextureGroup &A) const{
 		&& *normal_textures == *A.getNormal_textures()
 		&& *distortion_textures == *A.getDistortion_textures() 
 		&& *opacity_textures == *A.getOpacity_textures() 
-		&& *optional_textures == *A.getOptional_textures())
+		&& *optional_textures == *A.getOptional_textures()
+		&& *shadowmap_textures == *A.getShadowmap_textures()
+		)
 		return true;
 	else
 		return false; 
@@ -211,6 +216,7 @@ void TextureGroup::bindFirst(Shader* shader) {
 
 	if (optional_textures != nullptr && optional_textures->isInitialized()) optional_textures->Bind(Echeyde::OPTIONAL0, shader);
 
+	if (shadowmap_textures != nullptr && shadowmap_textures->isInitialized()) shadowmap_textures->Bind(Echeyde::SHADOWMAP0, shader); 
 	
 
 }
