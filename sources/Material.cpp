@@ -6,11 +6,10 @@ Material::Material() {
 
 }
 
-Material::Material(const Material &A){
+Material::Material(Material &A){
 	assert(shader != nullptr); 
 	shader = A.getShader(); 
-	material_data mdat = A.getTextureGroup().getMaterialData(); 
-	textures = std::shared_ptr<TextureGroup>(new TextureGroup(mdat)); 
+	textures = std::shared_ptr<TextureGroup>(new TextureGroup(*A.getTextureGroup())); 
 	ambient_color = A.ambient_color;
 	specular_color = A.specular_color;
 	specular_exponent = A.specular_exponent;
@@ -21,12 +20,12 @@ Material::Material(const Material &A){
 
 }
 
-Material::Material(BaseShader *s)
+Material::Material(Shader *s)
 {
 	shader = s; 
 }
 
-Material::Material(BaseShader *s, TextureGroup &tex) {
+Material::Material(Shader *s, TextureGroup &tex) {
 	shader = s;
 	textures = std::shared_ptr<TextureGroup>(new TextureGroup(tex));
 	specular_exponent = 0.f;
@@ -34,7 +33,7 @@ Material::Material(BaseShader *s, TextureGroup &tex) {
 	reflectivity = 0.f;
 }
 
-Material::Material(BaseShader *s, TextureGroup &tex, bool trans) {
+Material::Material(Shader *s, TextureGroup &tex, bool trans) {
 	shader = s;
 	textures = std::shared_ptr<TextureGroup>(new TextureGroup(tex));
 	transparency = trans;
@@ -42,7 +41,7 @@ Material::Material(BaseShader *s, TextureGroup &tex, bool trans) {
 	specular_power = 0.f;
 	reflectivity = 0.f;
 }
-Material::Material(BaseShader *s, material_data& data) {
+Material::Material(Shader *s, material_data& data) {
 	specular_exponent = data.specular_exponent;
 	specular_power = data.specular_strength;
 	reflectivity = 0.f;
@@ -76,7 +75,7 @@ void Material::BindValues(){
 }
 
 void Material::Bind() {
-	glUseProgram(shader->getProgram());
+	shader->BindShader(); 
 	if (isTextured())
 		textures->bindFirst(shader);
 	shader->BindMaterials(specular_power, specular_exponent,isTextured());
@@ -85,19 +84,22 @@ void Material::Bind() {
 
 void Material::Unbind() {
 	textures->unbind(); 
-	glUseProgram(0);
+	shader->UnBindShader(); 
 }
 
-
-bool Material::operator==(Material A){
-	if (A.getShader() == getShader() && A.getTextureGroup() == *textures && specular_exponent == A.getSpecularExponent() &&
+//il se fout de ma gueule ce programme
+bool Material::operator==(Material &A){
+	bool equal_tex = *A.getTextureGroup() == *textures; 
+	bool equal_shader = A.getShader() == getShader();
+	
+	if (equal_shader && equal_tex && specular_exponent == A.getSpecularExponent() &&
 		reflectivity == A.getReflectivity() && specular_exponent == A.getSpecularExponent() && A.isTransparent() == transparency)
 		return true;
 	else
 		return false;
 }
 
-bool Material::operator<(const Material &A) const {
+bool Material::operator<( Material &A)  {
 	if (getProgram() < A.getProgram() || getTextureGroup() < A.getTextureGroup())
 		return true;
 	else

@@ -122,7 +122,7 @@ vec4 blend(){
 	
 	vec4 blendmap = texture2D(opacity , nTex); 
 	float backTexAmount = 1 - (blendmap.r + blendmap.g + blendmap.b) ; 
-	vec2 tiled = nTex * 50. ; 
+	vec2 tiled = nTex * 200. ; 
 	vec4 a = texture2D(diffuse , tiled) * blendmap.r; 
 	vec4 b = texture2D(optional , tiled) * blendmap.g ; 
 	vec4 c = texture2D(normal , tiled) * blendmap.b  ; 

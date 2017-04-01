@@ -28,7 +28,7 @@ void main(){
 	s_model = model ; 
 	gl_Position = MVP*vec4(vertex,1.); 
 	col=color; 
-	tex=texture ;
+	tex=vec2(texture.x , texture.y) ;
 	vec3 nmapN = normalize((model * vec4(normal,1.)).xyz) ; 
 	norm = nmapN;
 	vec3 tangN = normalize((model * vec4(tangent, 1.)).xyz); 

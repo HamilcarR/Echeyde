@@ -5,6 +5,33 @@
 
 
 
+
+
+geometry_data TerrainGenerator::generateTerrain(const char* heightmap){
+	
+	geometry_data(*ptr)(const char*) = &TerrainGenerator::generate;
+	auto f = std::async(std::launch::async,
+		[&ptr , heightmap]{
+		return ptr((HEIGHTMAPS_LOCATION + std::string(heightmap)).c_str());
+	}
+	);
+	return f.get();
+
+}
+
+geometry_data TerrainGenerator::generateTerrain(unsigned int size){
+	geometry_data(*ptr)(unsigned int) = &TerrainGenerator::generate;
+	auto f = std::async(std::launch::async,
+		[&ptr, size]{
+		return ptr(size);
+	}
+	);
+	return f.get();
+}
+
+
+
+
 /*TODO : create a 2D array with vertex data on it*/
 
 float **TerrainGenerator::location_array = nullptr;
@@ -22,7 +49,7 @@ static float compute_height(const unsigned int x, const unsigned int y,const ima
 	if (x < 0 || x >= image.size || y < 0 || y >= image.size)
 		return 0.f;
 	float pixel_value = float(image.image[x*image.size + y]); 
-	float total = MAX_TERRAIN_HEIGHT * (pixel_value / 256.f) * 2 - 1;
+	float total = MAX_TERRAIN_HEIGHT * ((pixel_value / 256.f) * 2 - 1);
 	return total;
 }
 
@@ -39,7 +66,7 @@ static glm::vec3 compute_normals(int offset, unsigned int PosX, unsigned int Pos
 }
 
 
-geometry_data TerrainGenerator::generateTerrain(const char* file_heightmap){
+geometry_data TerrainGenerator::generate(const char* file_heightmap){
 	int w = 0, h = 0 , chan = 0 ; 
 	unsigned char* img_data = SOIL_load_image(file_heightmap, &w, &h, 0 , SOIL_LOAD_L);
 	
@@ -59,13 +86,14 @@ geometry_data TerrainGenerator::generateTerrain(const char* file_heightmap){
 			terrain.vertex.push_back((float)width);
 			if (width < size - 1 && height < size - 1){
 				/*first triangle indices*/
+				terrain.indices.push_back((width + 1)*size + height);
+				terrain.indices.push_back(width*size + height + 1);
 				terrain.indices.push_back(width*size + height);
-				terrain.indices.push_back(width*size + height + 1);
-				terrain.indices.push_back((width + 1)*size + height);
 				/*second triangle indices*/
-				terrain.indices.push_back((width + 1)*size + height + 1);
-				terrain.indices.push_back((width + 1)*size + height);
 				terrain.indices.push_back(width*size + height + 1);
+				terrain.indices.push_back((width + 1)*size + height);
+				terrain.indices.push_back((width + 1)*size + height + 1);
+
 			}
 
 			terrain.texture.push_back(height / (float)size);
@@ -101,7 +129,7 @@ geometry_data TerrainGenerator::generateTerrain(const char* file_heightmap){
 
 
 
-geometry_data TerrainGenerator::generateTerrain(unsigned int size){
+geometry_data TerrainGenerator::generate(unsigned int size){
 
 	geometry_data terrain; 
 	

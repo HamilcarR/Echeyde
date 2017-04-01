@@ -159,33 +159,36 @@ void Mesh::Unbind() {
 
 
 
-void Mesh::display_dynamic(glm::mat4 &projection, glm::mat4 &view) {
+void Mesh::display_dynamic(glm::mat4 &projection, glm::mat4 &view , Shader* shader) {
 
 	if (displayed) {
 		if (isTransparent()){
 			glDisable(GL_CULL_FACE);
-			Bind();
-			getMaterial()->getShader()->BindMatrices(projection, view, transform.getModelMatrix());
+		//	Bind();
+	//		getMaterial()->getShader()->BindMatrices(projection, view, transform.getModelMatrix());
+			shader->BindMatrices(projection, view, transform.getModelMatrix()); 
 			glBindVertexArray(vao);
 			{
 
 				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_INT, 0);
 			}
-			glBindVertexArray(vao);
+			glBindVertexArray(0);
 			Unbind();
 			
 		}
 		else{
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
-			Bind();
+	//		Bind();
+		//	getMaterial()->getShader()->BindMatrices(projection, view, transform.getModelMatrix());
 
+			shader->BindMatrices(projection, view, transform.getModelMatrix()); 
 			glBindVertexArray(vao);
 			{
 
 				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_INT, 0);
 			}
-			glBindVertexArray(vao);
+			glBindVertexArray(0);
 			Unbind();
 		}
 		
@@ -195,34 +198,37 @@ void Mesh::display_dynamic(glm::mat4 &projection, glm::mat4 &view) {
 }
 
 
-void Mesh::display_static(glm::mat4 &projection, glm::mat4 &view) {
+void Mesh::display_static(glm::mat4 &projection, glm::mat4 &view , Shader* shader) {
 
 	if (displayed) {
 		if (isTransparent()){
 			glDisable(GL_CULL_FACE);
-
-			Bind();
+			shader->BindMatrices(projection, view, transform.getModelMatrix()); 
+		//	getMaterial()->getShader()->BindMatrices(projection, view, transform.getModelMatrix());
+	//		Bind();
 
 			glBindVertexArray(vao);
 			{
 
 				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_INT, 0);
 			}
-			glBindVertexArray(vao);
+			glBindVertexArray(0);
 			Unbind();
 			
 		}
 		else{
 			glEnable(GL_CULL_FACE);
 			glCullFace(GL_BACK);
-			Bind();
+		//	Bind();
 
+			shader->BindMatrices(projection, view, transform.getModelMatrix()); 
+			//getMaterial()->getShader()->BindMatrices(projection, view, transform.getModelMatrix());
 			glBindVertexArray(vao);
 			{
 
 				glDrawElements(GL_TRIANGLES, data.indices.size(), GL_UNSIGNED_INT, 0);
 			}
-			glBindVertexArray(vao);
+			glBindVertexArray(0);
 			Unbind();
 		}
 
@@ -233,6 +239,10 @@ void Mesh::display_static(glm::mat4 &projection, glm::mat4 &view) {
 
 /**************************************************************************************************************************/
 
-void Mesh::addTexture(Echeyde::TEX type, std::string& file, std::string& shader_variable_name){
+void Mesh::setTexture(Texture A  , Echeyde::TEX id){
 
+material->setTexture(A, id);
+textured_model = material->isTextured(); 
+Renderer::getInstance()->sort(); 
 }
+

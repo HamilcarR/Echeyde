@@ -12,11 +12,11 @@ public:
 	glm::mat4 getProjectionMatrix();
 
 	void Move(SDL_Event &event);
-
+	void setPosition(glm::vec3 pos){ m_position = pos;  }
 	void orienter(int xRel, int yRel);
 	void invert_pitch();
 	void move(const glm::vec3 &position);
-	glm::vec3 getPosition() { return glm::vec3(m_position.x ,- m_position.y , m_position.z); }
+	glm::vec3 getPosition() { return glm::vec3(m_position.x , m_position.y , m_position.z); }
 
 private:
 	float sensibility;

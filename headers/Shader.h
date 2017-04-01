@@ -11,6 +11,13 @@
 #endif // WIN32
 
 
+struct MaterialUni{
+	GLuint specular_pow; 
+	GLuint specular_expo;
+	GLuint textured;
+};
+
+
 
 class Shader
 {
@@ -32,12 +39,16 @@ public:
 	const GLuint getUniformProjection()const{ return uniform_projection; }
 	const GLuint getUniformView()const{ return uniform_view; }
 	const GLuint getUniformModel()const{ return uniform_model; }
+	virtual void BindShader(); 
+	virtual void UnBindShader();
+	virtual void BindMaterials(float pow, float expo, bool textured) ; 
 protected:
 	void compile_shaders();
 	void create_shaders(); 
 	void set_textures_uni(GLuint program);
 	GLuint uniform_textures[Echeyde::TEX_SIZE]; 
 
+	MaterialUni material_uni;
 	std::string vertex_shader_name; 
 	std::string fragment_shader_name;
 	std::string geometry_shader_name;
@@ -79,11 +90,12 @@ struct ShaderSLightUni{
 	std::vector<GLuint> uni_radius;
 };
 
-struct MaterialUni{
-	GLuint specular_pow; 
-	GLuint specular_expo;
-	GLuint textured;
+struct LightsSizeUni{
+	GLuint directional; 
+	GLuint spot; 
+	GLuint point; 
 };
+
 class BaseShader :
 	public Shader
 {
@@ -93,7 +105,6 @@ public:
 	BaseShader(std::string &vertex_shader, std::string &fragment_shader, std::string &geometry_shader, std::string &tesselation_shader);
 	BaseShader(std::string &vertex_shader, std::string &fragment_shader);
 	virtual ~BaseShader();
-	virtual void BindMaterials(float pow, float expo, bool textured);
 	virtual void BindLights();
 	
 private:
@@ -104,6 +115,7 @@ private:
 	ShaderPLightUni PLight_uni;
 	ShaderSLightUni SLight_uni;
 
-	MaterialUni material_uni;
+	LightsSizeUni lights_size_uni; 
+
 	
 };

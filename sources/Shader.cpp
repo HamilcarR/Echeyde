@@ -31,7 +31,9 @@ Shader::Shader(std::string& v, std::string &f) {
 	uniform_projection = glGetUniformLocation(getProgram(), M_PROJECTION.c_str());
 	uniform_view = glGetUniformLocation(getProgram(), M_VIEW.c_str());
 	set_textures_uni(programID); 
-
+	material_uni.specular_expo = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[1]); 
+	material_uni.specular_pow = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[0]); 
+	material_uni.textured = glGetUniformLocation(getProgram(), "isTextured"); 
 }
 
 Shader::Shader(std::string &v, std::string &f, std::string &g) {
@@ -45,6 +47,9 @@ Shader::Shader(std::string &v, std::string &f, std::string &g) {
 	uniform_projection = glGetUniformLocation(getProgram(), M_PROJECTION.c_str());
 	uniform_view = glGetUniformLocation(getProgram(), M_VIEW.c_str());
 	set_textures_uni(programID);
+	material_uni.specular_expo = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[1]); 
+	material_uni.specular_pow = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[0]); 
+	material_uni.textured = glGetUniformLocation(getProgram(), "isTextured"); 
 
 }
 Shader::Shader(std::string &v, std::string &f, std::string &g, std::string &t)
@@ -60,7 +65,9 @@ Shader::Shader(std::string &v, std::string &f, std::string &g, std::string &t)
 	uniform_view = glGetUniformLocation(getProgram(), M_VIEW.c_str());
 	set_textures_uni(programID);
 
-
+	material_uni.specular_expo = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[1]); 
+	material_uni.specular_pow = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[0]); 
+	material_uni.textured = glGetUniformLocation(getProgram(), "isTextured"); 
 
 
 }
@@ -260,9 +267,13 @@ void Shader::BindTextures( Echeyde::TEX tex_name){
 
 
 
+void Shader::BindShader(){
+	glUseProgram(programID); 
+}
 
-
-
+void Shader::UnBindShader(){
+	glUseProgram(0); 
+}
 
 
 
@@ -328,16 +339,31 @@ static uni_lights_array get_lights_uni(GLuint program){
 }
 
 
+BaseShader::BaseShader(){
+
+}
+BaseShader::BaseShader(std::string &vertex_shader, std::string &fragment_shader) : Shader(vertex_shader, fragment_shader){
+	uni_lights_array uni = get_lights_uni(getProgram()); 
+	SLight_uni = uni.SLight_uni;
+	DLight_uni = uni.DLight_uni;
+	PLight_uni = uni.PLight_uni;
+	
+	lights_size_uni.directional = glGetUniformLocation(getProgram(), "directional_lights_size");
+	lights_size_uni.point = glGetUniformLocation(getProgram(), "point_lights_size");
+	lights_size_uni.spot =glGetUniformLocation(getProgram(), "spot_lights_size");
 
 
+}
 BaseShader::BaseShader(std::string &vertex_shader, std::string &fragment_shader, std::string &geometry_shader) : Shader(vertex_shader, fragment_shader, geometry_shader){
 	uni_lights_array uni = get_lights_uni(getProgram()); 
 	SLight_uni = uni.SLight_uni;
 	DLight_uni = uni.DLight_uni;
 	PLight_uni = uni.PLight_uni;
-	material_uni.specular_expo = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[1]); 
-	material_uni.specular_pow = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[0]); 
-	material_uni.textured = glGetUniformLocation(getProgram(), "isTextured"); 
+	
+	lights_size_uni.directional = glGetUniformLocation(getProgram(), "directional_lights_size");
+	lights_size_uni.point = glGetUniformLocation(getProgram(), "point_lights_size");
+	lights_size_uni.spot =glGetUniformLocation(getProgram(), "spot_lights_size");
+
 
 }
 
@@ -389,22 +415,22 @@ void BaseShader::BindLights(){
 
 		}
 
-		glUniform1ui(glGetUniformLocation(getProgram(), "directional_lights_size"), directional);
-		glUniform1ui(glGetUniformLocation(getProgram(), "point_lights_size"), point);
-		glUniform1ui(glGetUniformLocation(getProgram(), "spot_lights_size"), spot);
+		glUniform1ui(lights_size_uni.directional, directional);
+		glUniform1ui(lights_size_uni.point, point);
+		glUniform1ui(lights_size_uni.spot, spot);
 
 
 	}
 }
 /*****************************************************************************************************************************************/
 
-void BaseShader::BindMaterials(float pow, float exp,bool textured){
+
+void Shader::BindMaterials(float pow, float exp,bool textured){
 	glUniform1f(material_uni.specular_expo, exp);
 	glUniform1f(material_uni.specular_pow, pow); 
 	glUniform1i(material_uni.textured, (textured == true) ? 1 : 0);
 
 }
-
 
 
 

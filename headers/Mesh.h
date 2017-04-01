@@ -20,16 +20,17 @@ public:
 	Mesh(const Mesh& A); 
 	virtual ~Mesh();
 	virtual void clean();
-	void display_static(glm::mat4 &projection_matrix,  glm::mat4 &view); 
-	void display_dynamic(glm::mat4 &projection_matrix, glm::mat4 &view);
-	void addTexture(Echeyde::TEX texture_type, std::string& file, std::string& shader_variable_name); 
+	void display_static(glm::mat4 &projection_matrix,  glm::mat4 &view, Shader* shader); 
+	void display_dynamic(glm::mat4 &projection_matrix, glm::mat4 &view , Shader* shader);
 	bool isTransparent() { return material->isTransparent(); }
 	bool isDisplayed() { return displayed; }
+	void setDisplayed(bool k){ displayed = k;  }
 	uniform_matrix getUniforms(){ return uniforms; }
 	std::shared_ptr<Material> getMaterial(){ return material; }
 	geometry_data getGeometry(){ return data; }
 	Transform* getTransform(){ return &transform;  }
-	
+	void setTexture(Texture A, Echeyde::TEX id);
+
 protected:
 	
 	bool textured_model;

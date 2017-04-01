@@ -31,7 +31,7 @@ const std::string SHADER_LOCATION = "shaders/";
 const std::string RESSOURCES_LOCATION = "res/";
 const std::string TEXTURES_LOCATION = RESSOURCES_LOCATION + "textures/";
 const std::string HEIGHTMAPS_LOCATION = TEXTURES_LOCATION + "heightmaps/"; 
-
+const std::string SKYBOX_LOCATION = TEXTURES_LOCATION + "skybox/";
 /****************************************************************************************************************************************************************************/
 /*Constants*/
 const uint16_t WIDTH = 900; 
@@ -266,111 +266,8 @@ struct uniform_struct {
 /****************************************************************************************************************************************************************************/
 /*basic 3D models*/
 
-namespace echeyde{
-	namespace testing{
-		const std::vector<float> cube = {
-			// front
-			-1.0, -1.0, 1.0,
-			1.0, -1.0, 1.0,
-			1.0, 1.0, 1.0,
-			-1.0, 1.0, 1.0,
-			// back
-			-1.0, -1.0, -1.0,
-			1.0, -1.0, -1.0,
-			1.0, 1.0, -1.0,
-			-1.0, 1.0, -1.0
-		};
-
-
-		const std::vector<float> color = {
-			// front colors
-			1.0, 0.0, 0.0,
-			0.0, 1.0, 0.0,
-			0.0, 0.0, 1.0,
-			1.0, 1.0, 1.0,
-			// back colors
-			1.0, 0.0, 0.0,
-			0.0, 1.0, 0.0,
-			0.0, 0.0, 1.0,
-			1.0, 1.0, 1.0
-		};
-		const std::vector<unsigned short> indice = {// front
-			0, 1, 2,
-			2, 3, 0,
-			// top
-			1, 5, 6,
-			6, 2, 1,
-			// back
-			7, 6, 5,
-			5, 4, 7,
-			// bottom
-			4, 0, 3,
-			3, 7, 4,
-			// left
-			4, 5, 1,
-			1, 0, 4,
-			// right
-			3, 2, 6,
-			6, 7, 3 };
-
-	}
-}
 
 /****************************************************************************************************************************************************************************/
 /**/
-
-
-class Transform{
-
-public:
-
-	
-	Transform(){
-		translation = glm::vec3(0.); 
-		rotation = glm::vec4(0.); 
-		scaling = glm::vec3(1.);
-		model = glm::mat4(1.); 
-	}
-	virtual ~Transform(){
-
-	}
-
-	virtual void translate(glm::vec3 trans){
-		translation = trans;
-		model = glm::translate(translation); 
-	}
-
-	virtual void scale(glm::vec3 scal){
-		scaling = scal;
-		model = glm::scale(scaling);
-	}
-
-	virtual void rotate(float angle, glm::vec3 direction){
-		rotation = glm::vec4(direction, angle); 
-		model = glm::rotate(angle, direction); 
-	}
-
-	virtual glm::vec3 getPosition(){
-		return translation;
-	}
-	virtual glm::vec4 getRotation(){
-		return rotation;
-	}
-	virtual glm::vec3 getScale(){
-		return scaling; 
-	}
-
-	virtual glm::mat4 getModelMatrix(){
-		return model;
-	}
-
-	glm::vec3 translation;
-	glm::vec4 rotation;
-	glm::vec3 scaling;
-
-	glm::mat4 model;
-
-};
-
 
 #endif 

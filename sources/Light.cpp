@@ -21,13 +21,14 @@ void LightArray::clean(){
 /*Base Light class*/
 
 Light::Light(){
-	position = colour = glm::vec3(0); 
+	colour = glm::vec3(0); 
+	
 	power = 0.f;
 }
 
 
 Light::Light(base_light_data& data){
-	position = data.position;
+	transform.translate( data.position);
 	colour = data.colour;
 	power = data.power;
 }

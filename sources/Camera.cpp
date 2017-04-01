@@ -25,7 +25,7 @@ Camera::Camera(int left, int right, int bottom, int top) {
 
 Camera::Camera(float sensibility, float speed, glm::vec3 vertical, float FOV, float ratio, float near, float far) :sensibility(sensibility), speed(speed), m_vertical(vertical)
 {
-	m_projection = perspective(FOV, ratio, near, far);
+	m_projection = perspective(float(toRadian(FOV)), ratio, near, far);
 	m_phi = 0.F;
 	m_theta = 0.F;
 	m_orientation = vec3(5, 0, 0);
@@ -45,8 +45,8 @@ Camera::~Camera()
 
 void Camera::orienter(int xRel, int yRel) {
 
-	m_phi += -yRel * sensibility;
-	m_theta += -xRel * sensibility;
+	m_phi += yRel * sensibility;
+	m_theta += xRel * sensibility;
 
 
 	m_phi = clamp(m_phi, -89.F, 89.F);
@@ -113,12 +113,12 @@ void  Camera::Move(SDL_Event &event) {
 			m_aim = m_position + m_orientation;
 
 		}
-		if (event.key.keysym.sym == SDLK_d) {
+		if (event.key.keysym.sym == SDLK_q) {
 			m_position = m_position + m_lateral * +speed;
 			m_aim = m_position + m_orientation;
 
 		}
-		if (event.key.keysym.sym == SDLK_q) {
+		if (event.key.keysym.sym == SDLK_d) {
 			m_position = m_position - m_lateral*+speed;
 			m_aim = m_position + m_orientation;
 

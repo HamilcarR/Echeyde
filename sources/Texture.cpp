@@ -15,6 +15,16 @@ Texture::Texture() {
 	texture = ""; 
 }
 /************************************************************************************/
+Texture::Texture(Texture &A){
+	id = A.getTexture();
+	texture = A.getTextureFile(); 
+}
+
+Texture::Texture(unsigned int idd, std::string name){
+	id = idd; 
+	texture = name; 
+}
+
 
 Texture::Texture(std::string& filename)
 {
@@ -97,7 +107,10 @@ bool Texture::operator<(const Texture &A) const{
 		return false;
 }
 
-
+void Texture::operator=(Texture &A)  {
+	id = A.getTexture(); 
+	texture = A.getTextureFile(); 
+}
 
 /******************************************************************************************************************************************************************************************/
 /*TextureGroup class*/
@@ -110,6 +123,19 @@ TextureGroup::TextureGroup() {
 	optional_textures = std::shared_ptr<Texture>(new Texture());
 	shadowmap_textures = std::shared_ptr<Texture>(new Texture());
 }
+
+TextureGroup::TextureGroup(TextureGroup &A){
+	diffuse_textures = std::shared_ptr<Texture>(new Texture(*A.getDiffuse_textures()));
+	blend_textures = std::shared_ptr<Texture>(new Texture(*A.getBlend_textures()));
+	normal_textures = std::shared_ptr<Texture>(new Texture(*A.getNormal_textures()));
+	opacity_textures = std::shared_ptr<Texture>(new Texture(*A.getOpacity_textures()));
+	distortion_textures = std::shared_ptr<Texture>(new Texture(*A.getDistortion_textures()));
+	optional_textures = std::shared_ptr<Texture>(new Texture(*A.getOptional_textures()));
+	shadowmap_textures = std::shared_ptr<Texture>(new Texture(*A.getShadowmap_textures()));
+}
+
+
+
 /************************************************************************************/
 TextureGroup::TextureGroup(material_data& mat) {
 	TextureArray *instance = TextureArray::getUniqueInstance(); 
@@ -123,13 +149,13 @@ TextureGroup::TextureGroup(material_data& mat) {
 	try {
 		
 			
-		if (!mat.diffuse_empty())	diffuse_textures=instance->addOrReturn(mat.textures.diffuse);
-		if (!mat.normal_empty())	normal_textures= instance->addOrReturn(mat.textures.normal);
-		if (!mat.opacity_empty())	opacity_textures = instance->addOrReturn(mat.textures.opacity);
-		if (!mat.distortion_empty()) distortion_textures = instance->addOrReturn(mat.textures.distortion);
-		if (!mat.optional_empty())	optional_textures = instance->addOrReturn(mat.textures.optional);
-		if (!mat.blend_empty())	blend_textures = instance->addOrReturn(mat.textures.blend);
-		if (!mat.shadowmap_empty()) shadowmap_textures = instance->addOrReturn(mat.textures.shadowmap); 
+		if (!mat.diffuse_empty())	diffuse_textures=instance->addOrReturn(mat.textures.diffuse,-1);
+		if (!mat.normal_empty())	normal_textures= instance->addOrReturn(mat.textures.normal,-1);
+		if (!mat.opacity_empty())	opacity_textures = instance->addOrReturn(mat.textures.opacity, -1);
+		if (!mat.distortion_empty()) distortion_textures = instance->addOrReturn(mat.textures.distortion, -1);
+		if (!mat.optional_empty())	optional_textures = instance->addOrReturn(mat.textures.optional, -1);
+		if (!mat.blend_empty())	blend_textures = instance->addOrReturn(mat.textures.blend, -1);
+		if (!mat.shadowmap_empty()) shadowmap_textures = instance->addOrReturn(mat.textures.shadowmap, -1);
 		Mdata = mat; 
 		
 	}
@@ -223,6 +249,64 @@ void TextureGroup::bindFirst(Shader* shader) {
 	
 
 
+
+
+void TextureGroup::setTexture(Texture A, Echeyde::TEX type){
+	switch (type){
+	case Echeyde::DIFFUSE0 : 
+		setDiffuse_textures(A);
+		break;
+	case Echeyde::NORMAL0 : 
+		setNormal_textures(A); 
+		break; 
+	case Echeyde::OPACITY0:
+		setOpacity_textures(A); 
+		break; 
+	case Echeyde::DUDV0:
+		setDistortion_textures(A); 
+		break;
+	case Echeyde::OPTIONAL0:
+		setOptional_textures(A);
+		break;
+	case Echeyde::SHADOWMAP0:
+		setShadowmap_textures(A);
+		break;
+	case Echeyde::BLENDMAP0:
+		setBlend_textures(A);
+		break;
+	}
+}
+
+
+void TextureGroup::setDiffuse_textures(Texture A)   { 
+	
+	*diffuse_textures = A; 
+}
+void TextureGroup::setNormal_textures(Texture A)  { 
+
+	*normal_textures = A; 
+}
+void TextureGroup::setOpacity_textures(Texture A)  { 
+
+	*opacity_textures = A; 
+}
+void TextureGroup::setDistortion_textures(Texture A)  {
+
+	*distortion_textures = A; 
+}
+void TextureGroup::setOptional_textures(Texture A)  {
+
+	*optional_textures = A; 
+}
+void TextureGroup::setBlend_textures(Texture A)  {
+
+	*blend_textures = A; 
+}
+void TextureGroup::setShadowmap_textures(Texture A)  {
+
+	*shadowmap_textures = A; 
+}
+
 void TextureGroup::unbind() {
 	glBindTexture(GL_TEXTURE_2D, 0); 
 }
@@ -255,16 +339,23 @@ TextureArray::~TextureArray() {
 }
 /************************************************************************************/
 
-std::shared_ptr<Texture> TextureArray::addOrReturn(std::string& file) {
+std::shared_ptr<Texture> TextureArray::addOrReturn(std::string& file , GLuint id) {
 	for (const std::pair<unsigned int, std::shared_ptr<Texture>> &P : texture_array) {
 		if (P.second->getTextureFile().compare(file) == 0)
 			return P.second;
 	}
 	std::shared_ptr<Texture> tex;
 	try {
-		tex= std::shared_ptr<Texture>(new Texture(file));
+		if (file.find(std::string(".png")) != std::string::npos)
+			tex = std::shared_ptr<Texture>(new Texture(file));
+		else{
+			tex = std::shared_ptr<Texture>(new Texture());
+			assert(id != -1); 
+			tex->setID(id); 
+			tex->setName(file); 
+		}
 
-	}
+		}
 	catch (const TextureException& e) {
 		std::cout << e.what() << std::endl; 
 		return std::shared_ptr<Texture>(); 

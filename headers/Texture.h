@@ -8,13 +8,18 @@ class Texture
 public:
 	Texture(); 
 	Texture(std::string &image);
+	Texture(GLuint id , std::string name); 
+	Texture(Texture &A); 
 	virtual ~Texture();
 	virtual void clean();
 	GLuint getTexture(); 
+	void setID(GLuint idd){ id = idd; }
+	void setName(std::string& name) { texture = name; }
 	virtual void Bind(Echeyde::TEX texture_type, Shader* shader);
 	void Unbind(); 
 	bool isInitialized();
 	bool operator==(Texture &A) const;
+	void operator=(Texture &A) ; 
 	bool operator<(const Texture &A) const; 
 	const std::string& getTextureFile() const { return texture; }
 private:
@@ -28,6 +33,7 @@ class TextureGroup {
 public:
 	TextureGroup();
 	TextureGroup(material_data &data);
+	TextureGroup(TextureGroup &A); 
 	virtual ~TextureGroup();
 	virtual void clean();
 
@@ -38,6 +44,8 @@ public:
 	const std::shared_ptr<Texture> getOptional_textures() const { return optional_textures; }
 	const std::shared_ptr<Texture> getBlend_textures() const { return blend_textures; }
 	const std::shared_ptr<Texture> getShadowmap_textures() const { return shadowmap_textures; }
+
+	void setTexture(Texture A, Echeyde::TEX type); 
 	bool operator==(TextureGroup &A) const;
 	bool operator<(const TextureGroup &A) const; 
 	void bindFirst(Shader* shader);
@@ -54,6 +62,16 @@ private:
 	std::shared_ptr<Texture> distortion_textures;
 	std::shared_ptr<Texture> optional_textures;
 	std::shared_ptr<Texture> shadowmap_textures;
+
+
+
+	void setDiffuse_textures(Texture A);
+	void setNormal_textures(Texture A);
+	void setOpacity_textures(Texture A);
+	void setDistortion_textures(Texture A);
+	void setOptional_textures(Texture A);
+	void setBlend_textures(Texture A);
+	void setShadowmap_textures(Texture A);
 	
 };
 
@@ -68,7 +86,7 @@ public :
 	/*if texture_file doesn't exist in database,will create
 	*a new texture then return it...if it exists,return the existant texture
 	*/
-	std::shared_ptr<Texture> addOrReturn(std::string &texture_file);
+	std::shared_ptr<Texture> addOrReturn(std::string &texture_file , GLuint id);
 	bool idUsed(unsigned int id);
 	bool isLoadedTexture(std::string &file); 
 	std::map<unsigned int , std::shared_ptr<Texture>> getArray() { return texture_array;  }

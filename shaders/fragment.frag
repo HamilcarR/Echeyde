@@ -145,7 +145,8 @@ if(isTextured == 1){
 	vec4 Pspec = vec4(P.specular,0.); 
 	vec4 Dlight = vec4(D.diffuse,0.); 
 	vec4 Dspec = vec4(D.specular,0.);
-	color = texture2D(diffuse,Itex)*(Plight+Dlight) + (Pspec+Dspec);
+	color = texture2D(diffuse,Itex);//*(Plight+Dlight) + (Pspec+Dspec);
+
 	}
 	else{
 	vec3 nmap_normales = normalize(Inorm); 
