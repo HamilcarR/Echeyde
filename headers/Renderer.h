@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "Skybox.h"
 #include "Framebuffer.h"
+#include "Camera.h"
 
 class Renderer
 {
@@ -14,12 +15,12 @@ public:
 	 void addStaticMeshes(std::vector<Mesh*> &meshes);
 	 void addGui(std::vector<Mesh*> &meshes);
 	 void addGui(Mesh* M); 
-	 void renderAll(glm::mat4& projection, glm::mat4 &view, Skybox *skybox);
-	 void renderStaticMeshes(glm::mat4 projection, glm::mat4 view);
-	 void renderDynamicMeshes(glm::mat4 projection,glm::mat4 view); 
+	 void renderAll(ViewCamera& camera ,  Skybox *skybox);
+	 void renderStaticMeshes(ViewCamera& camera);
+	 void renderDynamicMeshes(ViewCamera& camera); 
 	 void destroyPointersOnlyDynamic(); 
 	 void destroyPointersOnlyStatic(); 
-	 void renderShadowMap(glm::mat4& projection, glm::mat4& view , Framebuffer& framebuffer  , Shader* shader); 
+	 void renderShadowMap(ViewCamera& camera , Framebuffer& framebuffer  , Shader* shader); 
 	 void sortDynamic(); 
 	 void sortStatic(); 
 	 void sortGUI();

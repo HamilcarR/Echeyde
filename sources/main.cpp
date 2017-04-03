@@ -1,5 +1,4 @@
 #include "../headers/Constants.h"
-#include "../headers/View.h"
 #include "../headers/Window.h"
 #include "../headers/KInputs.h"
 

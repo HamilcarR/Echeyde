@@ -1,5 +1,4 @@
 #pragma once
-#include "View.h"
 #include "Mesh.h"
 namespace Echeyde {
 	class Scene

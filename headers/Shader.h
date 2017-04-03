@@ -42,7 +42,9 @@ public:
 	virtual void BindShader(); 
 	virtual void UnBindShader();
 	virtual void BindMaterials(float pow, float expo, bool textured) ; 
+	virtual void BindZParameters(bool isPerspective, float zNear, float zFar); 
 protected:
+	void Init_uniforms(); 
 	void compile_shaders();
 	void create_shaders(); 
 	void set_textures_uni(GLuint program);
@@ -60,7 +62,8 @@ protected:
 	GLuint fragment_shader;
 	GLuint geometry_shader;
 	GLuint tesselation_shader;
-
+	GLuint uniform_projection_type; /*  Perspective or ortho  */
+	GLuint uniform_z_parameters; /*  x = zNear , y = zFar   */
 	GLuint uniform_projection;
 	GLuint uniform_view;
 	GLuint uniform_model;

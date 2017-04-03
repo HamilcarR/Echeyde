@@ -38,9 +38,7 @@ const uint16_t WIDTH = 900;
 const uint16_t HEIGHT = 900; 
 const uint16_t EVENT_ARRAY_SIZE = 10; 
 const int vbo_size = 7; 
-const std::string M_PROJECTION = "projection";
-const std::string M_MODEL = "model";
-const std::string M_VIEW = "view";
+
 
 
 

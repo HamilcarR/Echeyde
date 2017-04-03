@@ -1,5 +1,4 @@
 #pragma once
-#include "View.h"
 #include "Shader.h"
 #include "Texture.h"
 class Material

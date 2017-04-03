@@ -1,6 +1,5 @@
 #ifndef WINDOW_H
 #define WINDOW_H
-#include "View.h"
 #include "KInputs.h"
 #include "Scene.h"
 #include "Constants.h"

@@ -66,7 +66,7 @@ void Window::Loop() {
 
 	try {
 	st = Echeyde::FILEIO::Importer::load_model(std::string("cube.obj"),true);
-   // si = Echeyde::FILEIO::Importer::load_model(std::string("sphere.obj"),false);
+    si = Echeyde::FILEIO::Importer::load_model(std::string("objects.obj"),false);
 	}
 	catch (const File_not_found &e) {
 		std::cout << e.what() << std::endl;
@@ -84,9 +84,12 @@ void Window::Loop() {
 	Framebuffer framebuffer(WIDTH, HEIGHT);
 	Framebuffer shadowframebuffer(WIDTH, HEIGHT); 
 	Texture A ( shadowframebuffer.getDepthTexture() , "reflection"); 
-
-
+	//ViewCamera light_view(70.f, float(WIDTH / HEIGHT), 0.1f, 2000.f, glm::vec3(0, 1, 0));
+	ViewCamera light_view(0.f, 800.f, 0.f, 800.f, 0.1f, 2000.f,glm::vec3(0,1,0)); 
+	light_view.setPosition(glm::vec3(500, 90, 300), glm::vec3(300, 90, 200)); 
 	GameObject cube = GameObject(st, &gui, true, false);
+	GameObject objects = GameObject(si, shader, true, false);
+	objects.translate(glm::vec3(400, 10, 400));
 	std::vector<Mesh*> mesh = cube.getMeshes(); 
 	mesh[0]->setTexture(A, Echeyde::DIFFUSE0);
 	//GameObject obj2 = GameObject(si, shader, true, false);
@@ -103,12 +106,12 @@ void Window::Loop() {
 		lights->addLight(new PointLight(data.base, data.radius, data.attenuation));
 
 
-		data.base.position = glm::vec3(20000,2000, 2000);
+		data.base.position = glm::vec3(200,200, 200);
 		data.base.colour = glm::vec3(0.54, 0.30, 0.25);
-		data.base.power = 0.21F;
+		data.base.power = 0.5F;
 		lights->addLight(new DirectionalLight(data.base));
-
-
+	//	glm::mat4 light_proj = glm::ortho(0. ,800., 0.,800. , 0.1 , 2000.); //TODO : frustrum values in shader uniform glm::perspective(120.f, float(WIDTH / HEIGHT), 0.1f, 2000.f);/
+		
 		data.base.position = glm::vec3(181, 30, 200);
 		data.attenuation = glm::vec3(1, 100, 10);
 		data.radius = 100.f;
@@ -139,14 +142,14 @@ void Window::Loop() {
 		std::vector<object_data> ob; 
 		ob.push_back(terrain_obj); 
 		GameObject terrain = GameObject(ob, terrain_shader, true, true);
-		cube.translate(glm::vec3(0.1, 0.1 , 0.1));
+		cube.translate(glm::vec3(0.6, 0.6 , 0.1));
 		cube.rotate(90, glm::vec3(1, 0, 0)); 
-		cube.scale(glm::vec3(0.5, 0.5, 0.5)); 
+		cube.scale(glm::vec3(0.3, 0.1, 0.3)); 
 		
-	std::unique_ptr<Camera> user_camera = std::unique_ptr<Camera>(new Camera(5.f, 5.f, glm::vec3(0, 1, 0), 70.f, float(WIDTH / HEIGHT), 0.1f, 5000.f));
-	user_camera->setPosition(glm::vec3(30, 50, 30)); 
+	Camera user_camera =  Camera(5.f, 5.f, glm::vec3(0, 1, 0), 70.f, float(WIDTH / HEIGHT), 0.1f, 5000.f);
+	user_camera.setPosition(glm::vec3(500, 90, 300)); 
 	SDL_Event event; 
-	float i = 0 , j = 0 , k = 0 , pow = 50; 
+	float i = 10 , j = 400 , k = 400 , pow = 50; 
 
 	while (loop) {
 //		DirectionalLight *P = dynamic_cast<DirectionalLight*>(lights->getLightArray()[1]);
@@ -173,28 +176,24 @@ void Window::Loop() {
 			if (event.key.keysym.sym == SDLK_KP_MINUS)
 				pow -= 1.5f;
 
-			user_camera->Move(event);
-		std::cout << user_camera->getPosition().x << "   " << user_camera->getPosition().y << "   " << user_camera->getPosition().z << std::endl;
+			user_camera.Move(event);
+			user_camera.print_data(); 
 
 		}
 
 		cube.isDisplayed(false); 
-
-	
-	renderer->renderShadowMap(user_camera->getProjectionMatrix(), user_camera->getViewMatrix(), shadowframebuffer, shadowShader); 
+	light_view.setAim(user_camera.getPosition()); 
+	renderer->renderShadowMap(light_view, shadowframebuffer, shadowShader); 
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		
-		cube.isDisplayed(true); 
-	//	P->rotateAround(0.001, glm::vec3(0, 0, 0), glm::vec3(1, 0, 0));
-		cube.translate(glm::vec3(i, j, k)); 
+	cube.isDisplayed(true); 
 		
-	//	P->setPosition(cube.getTransform().getPosition()); 
-	//	P->setPower(pow); 
 		
 
-		renderer->renderAll(user_camera->getProjectionMatrix(), user_camera->getViewMatrix() , &skybox); 
+		
+		renderer->renderAll(user_camera, &skybox); 
 		SDL_GL_SwapWindow(window); 
 	}
 	TextureArray::clean();

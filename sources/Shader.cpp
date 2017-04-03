@@ -6,6 +6,11 @@
 std::mutex file_mutex; 
 static const char* shader_uniforms_texture_names[] = { "diffuse", "normal", "opacity", "blendMap", "specular", "ambiant", "height", "dudv", "data", "optional","shadowmap" };
 static const char* shader_uniforms_specular_names[] = { "spec_power", "spec_exponent" };
+static const std::string M_PROJECTION = "projection";
+static const std::string M_MODEL = "model";
+static const std::string M_VIEW = "view";
+static const std::string Z_PARAMETERS = "Z_parameters"; 
+static const std::string PERSPECTIVE_TYPE = "isPerspective";
 void Shader::set_textures_uni(GLuint program){
 	using namespace Echeyde;
 	for (unsigned int i = 0; i < TEX_SIZE; i++)
@@ -15,6 +20,18 @@ void Shader::set_textures_uni(GLuint program){
 	
 }
 
+
+void Shader::Init_uniforms(){
+	uniform_model = glGetUniformLocation(getProgram(), M_MODEL.c_str());
+	uniform_projection = glGetUniformLocation(getProgram(), M_PROJECTION.c_str());
+	uniform_view = glGetUniformLocation(getProgram(), M_VIEW.c_str());
+	set_textures_uni(programID);
+	uniform_projection_type = glGetUniformLocation(getProgram(), PERSPECTIVE_TYPE.c_str());
+	uniform_z_parameters = glGetUniformLocation(getProgram(), Z_PARAMETERS.c_str()); 
+	material_uni.specular_expo = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[1]); 
+	material_uni.specular_pow = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[0]); 
+	material_uni.textured = glGetUniformLocation(getProgram(), "isTextured"); 
+}
 Shader::Shader() {
 	
 
@@ -27,13 +44,7 @@ Shader::Shader(std::string& v, std::string &f) {
 	tesselation_shader_name = " ";
 	create_shaders();
 	compile_shaders();
-	uniform_model = glGetUniformLocation(getProgram(), M_MODEL.c_str());
-	uniform_projection = glGetUniformLocation(getProgram(), M_PROJECTION.c_str());
-	uniform_view = glGetUniformLocation(getProgram(), M_VIEW.c_str());
-	set_textures_uni(programID); 
-	material_uni.specular_expo = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[1]); 
-	material_uni.specular_pow = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[0]); 
-	material_uni.textured = glGetUniformLocation(getProgram(), "isTextured"); 
+	Init_uniforms(); 
 }
 
 Shader::Shader(std::string &v, std::string &f, std::string &g) {
@@ -43,15 +54,10 @@ Shader::Shader(std::string &v, std::string &f, std::string &g) {
 	tesselation_shader_name = " ";
 	create_shaders();
 	compile_shaders();
-	uniform_model = glGetUniformLocation(getProgram(), M_MODEL.c_str());
-	uniform_projection = glGetUniformLocation(getProgram(), M_PROJECTION.c_str());
-	uniform_view = glGetUniformLocation(getProgram(), M_VIEW.c_str());
-	set_textures_uni(programID);
-	material_uni.specular_expo = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[1]); 
-	material_uni.specular_pow = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[0]); 
-	material_uni.textured = glGetUniformLocation(getProgram(), "isTextured"); 
+	Init_uniforms(); 
+}	
 
-}
+
 Shader::Shader(std::string &v, std::string &f, std::string &g, std::string &t)
 {
 	vertex_shader_name = SHADER_LOCATION+v;
@@ -60,14 +66,7 @@ Shader::Shader(std::string &v, std::string &f, std::string &g, std::string &t)
 	tesselation_shader_name = SHADER_LOCATION + t;
 	create_shaders(); 
 	compile_shaders(); 
-	uniform_model = glGetUniformLocation(getProgram(), M_MODEL.c_str());
-	uniform_projection = glGetUniformLocation(getProgram(), M_PROJECTION.c_str());
-	uniform_view = glGetUniformLocation(getProgram(), M_VIEW.c_str());
-	set_textures_uni(programID);
-
-	material_uni.specular_expo = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[1]); 
-	material_uni.specular_pow = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[0]); 
-	material_uni.textured = glGetUniformLocation(getProgram(), "isTextured"); 
+	Init_uniforms(); 
 
 
 }
@@ -252,6 +251,13 @@ bool Shader::operator==(const Shader A) const{
 
 
 /*****************************************************************************************************************************************/
+
+void Shader::BindZParameters(bool isPerspective, float zNear, float zFar){
+	glUniform1i(uniform_projection_type, (isPerspective == true) ? 1 : 0); 
+	glUniform2f(uniform_z_parameters, zNear, zFar); 
+}
+
+
 void Shader::BindMatrices(glm::mat4 &proj, glm::mat4 &view, glm::mat4 &model) const{
 	glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(proj));
 	glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));

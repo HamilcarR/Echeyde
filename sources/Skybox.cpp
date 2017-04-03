@@ -119,10 +119,11 @@ void Skybox::UnBind(){
 }
 
 
-void Skybox::render(glm::mat4 projection , glm::mat4 view){
+void Skybox::render(ViewCamera& camera){
 	glDisable(GL_CULL_FACE);
 	Bind(); 
-	shader.BindMatrices(projection, view, glm::mat4(1.)); 
+	shader.BindMatrices(camera.getProjectionMatrix(), camera.getViewMatrix(), glm::mat4(1.)); 
+	shader.BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar());
 	glBindVertexArray(vao);
 	{
 		glDrawElements(GL_TRIANGLES, indice.size(), GL_UNSIGNED_SHORT, 0); 

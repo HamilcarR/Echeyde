@@ -113,13 +113,14 @@ void Renderer::addDynamicMeshes(std::vector<Mesh*> &A){
 /**************************************************************************************************************************************/
 
 /**************************************************************************************************************************************/
-void Renderer::renderDynamicMeshes(glm::mat4 projection ,  glm::mat4 view){
+void Renderer::renderDynamicMeshes(ViewCamera& camera){
 	auto lambda = [&](std::pair<Material*, std::vector<Mesh*>> &Elem){
 		Elem.first->Bind();
 		BaseShader* s =dynamic_cast<BaseShader*> (Elem.first->getShader());
 		s->BindLights();
+		s->BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar()); 
 		for (Mesh* mesh : Elem.second)
-			mesh->display_dynamic(projection, view , s); 
+			mesh->display_dynamic(camera.getProjectionMatrix(), camera.getViewMatrix() , s); 
 		Elem.first->Unbind();
 	};
 	for_each(dynamic_mesh_list.begin(), dynamic_mesh_list.end(), lambda);
@@ -136,12 +137,13 @@ Mesh* Renderer::addStaticMesh(Mesh* A){
 /**************************************************************************************************************************************/
 
 
-void Renderer::renderStaticMeshes(glm::mat4 projection,  glm::mat4 view){
+void Renderer::renderStaticMeshes(ViewCamera& camera){
 	auto lambda = [&](std::pair<Material*, Mesh*> &Elem){
 		Elem.first->Bind();
 		BaseShader* s =dynamic_cast<BaseShader*> (Elem.first->getShader());
 		s->BindLights();
-			Elem.second->display_static(projection, view , s);
+		s->BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar()); 
+			Elem.second->display_static(camera.getProjectionMatrix(), camera.getViewMatrix() , s);
 		Elem.first->Unbind();
 	};
 	for_each(static_mesh_list.begin(), static_mesh_list.end(), lambda);
@@ -163,11 +165,11 @@ void Renderer::addStaticMeshes(std::vector<Mesh*> &A){
 /**************************************************************************************************************************************/
 
 
-void Renderer::renderAll(glm::mat4& projection , glm::mat4 &view , Skybox *skybox){
+void Renderer::renderAll(ViewCamera& camera , Skybox *skybox){
 	
-	skybox->render(projection , view); 
-	renderStaticMeshes(projection, view);
-	renderDynamicMeshes(projection, view); 
+	skybox->render(camera); 
+	renderStaticMeshes(camera);
+	renderDynamicMeshes(camera); 
 
 }
 
@@ -234,16 +236,17 @@ void Renderer::addGui(Mesh* M){
 }
 
 
-void Renderer::renderShadowMap(glm::mat4& projection, glm::mat4& view, Framebuffer& framebuffer , Shader* shader){
+void Renderer::renderShadowMap(ViewCamera& camera, Framebuffer& framebuffer , Shader* shader){
 	framebuffer.BindDepth(); 
 	shader->BindShader(); 
+	shader->BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar()); 
 	for (std::pair<Material*, std::vector<Mesh*>> &e : dynamic_mesh_list){
 		for (Mesh* mesh : e.second)
-			mesh->display_dynamic(projection, view , shader); 
+			mesh->display_dynamic(camera.getProjectionMatrix(), camera.getViewMatrix() , shader); 
 
 	}
 	for (std::pair<Material*, Mesh*> &e : static_mesh_list)
-		e.second->display_static(projection, view , shader); 
+		e.second->display_static(camera.getProjectionMatrix(), camera.getViewMatrix(), shader); 
 	shader->UnBindShader(); 
 	framebuffer.Unbind();
 

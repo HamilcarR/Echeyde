@@ -1,6 +1,7 @@
 #pragma once
 #include "Texture.h"
 #include "SkyboxShader.h"
+#include "Camera.h"
 class Skybox
 {
 public:
@@ -10,7 +11,7 @@ public:
 	virtual void Bind(); 
 	virtual void UnBind(); 
 	virtual void clean(); 
-	virtual void render(glm::mat4 projection , glm::mat4 camera_view_matrix); 
+	virtual void render(ViewCamera& camera); 
 protected:
 	GLuint cubemapID; 
 	Transform transform; 

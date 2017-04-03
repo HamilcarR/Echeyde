@@ -1,7 +1,6 @@
 #pragma once
 /*Game loop class and events */
-#include "View.h"
-
+#include "Constants.h"
 enum EVKEY : unsigned {Z = 0 , S = 1 , D = 2 , Q = 3 , K8 };
 class KInputs
 {
