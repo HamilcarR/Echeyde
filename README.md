@@ -12,4 +12,4 @@ Shadow mapping :
 ![shadow mapping](https://cloud.githubusercontent.com/assets/18567118/24738381/a16ee256-1a95-11e7-9594-284979c9a2d6.jpg)
 
 
-![smap](https://cloud.githubusercontent.com/assets/18567118/24738381/a16ee256-1a95-11e7-9594-284979c9a2d6.jpg)
+![smap](https://cloud.githubusercontent.com/assets/18567118/24738371/896316be-1a95-11e7-8c3f-02f3f8512ca7.jpg)
