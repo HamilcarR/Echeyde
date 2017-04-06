@@ -230,19 +230,26 @@ bool TextureGroup::operator==(TextureGroup &A) const{
 /************************************************************************************/
 
 void TextureGroup::bindFirst(Shader* shader) {
-	if (blend_textures != nullptr && blend_textures->isInitialized()) blend_textures->Bind(Echeyde::BLENDMAP0, shader);
+	if (blend_textures != nullptr && blend_textures->isInitialized()) 
+		blend_textures->Bind(Echeyde::BLENDMAP0, shader);
 
-	if (diffuse_textures != nullptr && diffuse_textures->isInitialized()) diffuse_textures->Bind(Echeyde::DIFFUSE0, shader);
+	if (diffuse_textures != nullptr && diffuse_textures->isInitialized()) 
+		diffuse_textures->Bind(Echeyde::DIFFUSE0, shader);
 	
-	if (normal_textures != nullptr && normal_textures->isInitialized()) normal_textures->Bind(Echeyde::NORMAL0, shader);
+	if (normal_textures != nullptr && normal_textures->isInitialized()) 
+		normal_textures->Bind(Echeyde::NORMAL0, shader);
 	
-	if (opacity_textures != nullptr && opacity_textures->isInitialized()) opacity_textures->Bind(Echeyde::OPACITY0, shader);
+	if (opacity_textures != nullptr && opacity_textures->isInitialized())
+		opacity_textures->Bind(Echeyde::OPACITY0, shader);
 
-	if (distortion_textures != nullptr && distortion_textures->isInitialized()) distortion_textures->Bind(Echeyde::DUDV0, shader);
+	if (distortion_textures != nullptr && distortion_textures->isInitialized()) 
+		distortion_textures->Bind(Echeyde::DUDV0, shader);
 
-	if (optional_textures != nullptr && optional_textures->isInitialized()) optional_textures->Bind(Echeyde::OPTIONAL0, shader);
+	if (optional_textures != nullptr && optional_textures->isInitialized()) 
+		optional_textures->Bind(Echeyde::OPTIONAL0, shader);
 
-	if (shadowmap_textures != nullptr && shadowmap_textures->isInitialized()) shadowmap_textures->Bind(Echeyde::SHADOWMAP0, shader); 
+	if (shadowmap_textures != nullptr && shadowmap_textures->isInitialized()) 
+		shadowmap_textures->Bind(Echeyde::SHADOWMAP0, shader); 
 	
 
 }
@@ -251,7 +258,9 @@ void TextureGroup::bindFirst(Shader* shader) {
 
 
 
-void TextureGroup::setTexture(Texture A, Echeyde::TEX type){
+void TextureGroup::setTexture(Texture B, Echeyde::TEX type){
+	TextureArray* texArray = TextureArray::getUniqueInstance(); 
+	Texture A = *texArray->addOrReturn(const_cast<std::string&>(B.getTextureFile()), B.getTexture());
 	switch (type){
 	case Echeyde::DIFFUSE0 : 
 		setDiffuse_textures(A);
@@ -308,7 +317,10 @@ void TextureGroup::setShadowmap_textures(Texture A)  {
 }
 
 void TextureGroup::unbind() {
-	glBindTexture(GL_TEXTURE_2D, 0); 
+	for (unsigned int i = 0; i < Echeyde::TEX_SIZE; i++){
+		glActiveTexture(GL_TEXTURE0 + i); 
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 }
 
 /******************************************************************************************************************************************************************************************/

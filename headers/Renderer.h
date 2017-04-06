@@ -15,9 +15,9 @@ public:
 	 void addStaticMeshes(std::vector<Mesh*> &meshes);
 	 void addGui(std::vector<Mesh*> &meshes);
 	 void addGui(Mesh* M); 
-	 void renderAll(ViewCamera& camera ,  Skybox *skybox);
-	 void renderStaticMeshes(ViewCamera& camera);
-	 void renderDynamicMeshes(ViewCamera& camera); 
+	 void renderAll(ViewCamera& camera ,  Skybox *skybox , ViewCamera shadowCam);
+	 void renderStaticMeshes(ViewCamera& camera, ViewCamera shadowCam);
+	 void renderDynamicMeshes(ViewCamera& camera, ViewCamera shadowCam); 
 	 void destroyPointersOnlyDynamic(); 
 	 void destroyPointersOnlyStatic(); 
 	 void renderShadowMap(ViewCamera& camera , Framebuffer& framebuffer  , Shader* shader); 

@@ -8,6 +8,7 @@ in vec3 Ito_spotLights[MAX_LIGHTS];
 in vec2 nTex; 
 in vec3 Inorm;
 in vec3 fragPos; 
+in vec4 depthFragment ; 
 out vec4 color; 
 
 
@@ -61,7 +62,7 @@ uniform int isTextured ;
 struct LightResult{
 	vec3 diffuse;
 	vec3 specular; 
-
+	float shadow_bias[MAX_LIGHTS]; 
 
 };
 
@@ -77,6 +78,7 @@ struct LightResult{
 LightResult computeDirectionalLights(vec3 Inor){
 	LightResult result;
 	result.diffuse = vec3(0.); 
+	result.shadow_bias[0] = 0.f;
 	result.specular = vec3(0.); 
 	vec3 normalized_normals = Inor; 
 	vec3 sum = vec3(0.); 
@@ -88,6 +90,7 @@ LightResult computeDirectionalLights(vec3 Inor){
 		vec3 to_light = normalize(position); 
 		float light_variation = max(dot( to_light,normalized_normals ) , 0.0 ) ;
 		result.diffuse += power * light_variation * color;
+		result.shadow_bias[i] = max(0.005 * (1. - dot(to_light , normalized_normals)),0.000001);
 	}
 	return result;
 
@@ -131,9 +134,12 @@ vec4 blend(){
 
 }
 
+const float pas = 0.0001f ; 
+const int s_size = 8102 ; 
+
 
 void main(){
-
+	
 	vec3 nmap_normales= normalize ( Inorm ) ; 
 	LightResult P = computePointLights(nmap_normales) ; 
 	LightResult D = computeDirectionalLights(nmap_normales) ; 
@@ -141,7 +147,19 @@ void main(){
 	vec4 Plight = vec4(P.diffuse,0.);
 	vec4 Dlight = vec4(D.diffuse,0.); 
 
-	color = blend()*(Plight+Dlight);
+	vec3 NDC =   ((depthFragment.xyz/depthFragment.w)+1)/2 ;
+	vec4 s1 = texture2D(shadowmap , vec2(NDC.x,NDC.y)); 
 	
+	
+	
+	
+	
+	
+	if(s1.r >= NDC.z - 0.002)//D.shadow_bias[0]) 
+		color = blend()*(Plight+Dlight);
+	else
+		color = blend() * vec4(0.01) ;	
+	
+	//color = texture2D(shadowmap,nTex) ; 
 
 }

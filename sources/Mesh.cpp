@@ -159,7 +159,7 @@ void Mesh::Unbind() {
 
 
 
-void Mesh::display_dynamic(glm::mat4 &projection, glm::mat4 &view , Shader* shader) {
+void Mesh::display_dynamic(glm::mat4 &projection, glm::mat4 &view , Shader* shader , GLenum culling) {
 
 	if (displayed) {
 		if (isTransparent()){
@@ -178,7 +178,7 @@ void Mesh::display_dynamic(glm::mat4 &projection, glm::mat4 &view , Shader* shad
 		}
 		else{
 			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
+			glCullFace(culling);
 	//		Bind();
 		//	getMaterial()->getShader()->BindMatrices(projection, view, transform.getModelMatrix());
 
@@ -198,7 +198,7 @@ void Mesh::display_dynamic(glm::mat4 &projection, glm::mat4 &view , Shader* shad
 }
 
 
-void Mesh::display_static(glm::mat4 &projection, glm::mat4 &view , Shader* shader) {
+void Mesh::display_static(glm::mat4 &projection, glm::mat4 &view , Shader* shader , GLenum culling) {
 
 	if (displayed) {
 		if (isTransparent()){
@@ -218,7 +218,7 @@ void Mesh::display_static(glm::mat4 &projection, glm::mat4 &view , Shader* shade
 		}
 		else{
 			glEnable(GL_CULL_FACE);
-			glCullFace(GL_BACK);
+			glCullFace(culling);
 		//	Bind();
 
 			shader->BindMatrices(projection, view, transform.getModelMatrix()); 

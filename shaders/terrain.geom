@@ -9,7 +9,9 @@ in vec2 tex[] ;
 in vec3 norm[]; 
 in vec3 frag[]; 
 in vec2 Ntex[];
+in vec4 depthfragment[];
 
+out vec4 depthFragment;
 out vec2 Itex;
 out vec3 Inorm;
 out vec3 fragPos; 
@@ -21,6 +23,7 @@ void main(){
 	Inorm = norm[0];	
 	fragPos = frag[0]; 
 	nTex = Ntex[0];
+	depthFragment = depthfragment[0];
     EmitVertex();
 
     gl_Position = gl_in[1].gl_Position ;
@@ -28,6 +31,7 @@ void main(){
 	Itex = tex[1];
 	Inorm = norm[1];	
 	fragPos= frag[1]; 
+	depthFragment = depthfragment[1];
     EmitVertex();
 
 	gl_Position = gl_in[2].gl_Position ;
@@ -35,6 +39,7 @@ void main(){
 	Itex = tex[2];
 	Inorm = norm[2];
 	fragPos= frag[2]; 
+	depthFragment = depthfragment[2];
     EmitVertex();
 
     EndPrimitive();

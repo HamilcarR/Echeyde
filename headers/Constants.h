@@ -34,8 +34,8 @@ const std::string HEIGHTMAPS_LOCATION = TEXTURES_LOCATION + "heightmaps/";
 const std::string SKYBOX_LOCATION = TEXTURES_LOCATION + "skybox/";
 /****************************************************************************************************************************************************************************/
 /*Constants*/
-const uint16_t WIDTH = 900; 
-const uint16_t HEIGHT = 900; 
+const uint16_t WIDTH = 1920; 
+const uint16_t HEIGHT = 1080; 
 const uint16_t EVENT_ARRAY_SIZE = 10; 
 const int vbo_size = 7; 
 
@@ -53,7 +53,7 @@ static const bool DEBUG_DESTRUCTOR = true;
 /*Enums*/
 namespace Echeyde {
 	enum VBO : unsigned { VERTEX = 0, COLOR = 1, NORMAL = 2, TANGENT = 3, TEXTURE = 4,BITANGENT = 5, INDICE = 6   };
-	const unsigned int TEX_SIZE = 10;
+	const unsigned int TEX_SIZE = 11;
 
 	enum TEX : unsigned { DIFFUSE0 = 0 , NORMAL0 = 1 , OPACITY0=2, BLENDMAP0 = 3 , SPECULAR0 = 4 , AMBIENT0 = 5 , HEIGHT0 = 6 , DUDV0 = 7 , DATA0 = 8 , OPTIONAL0 = 9 , SHADOWMAP0=10};
 	enum LIGHTTYPE : unsigned { DIRECTIONAL = 0, POINT = 1, SPOT = 2 };

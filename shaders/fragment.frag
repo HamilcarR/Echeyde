@@ -136,8 +136,7 @@ LightResult computePointLights(vec3 Inor){
 
 void main(){
 if(isTextured == 1){
-	vec3 nmap_normales=transpose(tangmat)*(normalize(2*texture2D(normal,Itex)-1)).rgb ;
-	 
+	vec3 nmap_normales=tangmat*(normalize(2*texture2D(normal,Itex)-1)).rgb ;
 	LightResult P = computePointLights(nmap_normales) ; 
 	LightResult D = computeDirectionalLights(nmap_normales) ; 
 
@@ -145,8 +144,8 @@ if(isTextured == 1){
 	vec4 Pspec = vec4(P.specular,0.); 
 	vec4 Dlight = vec4(D.diffuse,0.); 
 	vec4 Dspec = vec4(D.specular,0.);
+	
 	color = texture2D(diffuse,Itex)*(Plight+Dlight) + (Pspec+Dspec);
-//	color = vec4(1.); 
 	}
 	else{
 	vec3 nmap_normales = normalize(Inorm); 

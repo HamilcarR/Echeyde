@@ -13,17 +13,18 @@ layout(location=5) in vec3 bitangent;
 uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view; 
-
+uniform mat4 depthMatrix; 
 
 out vec2 tex ; 
 out vec3 norm ; 
 out vec3 frag; 
 out vec2 Ntex; 
-
+out vec4 depthfragment ; 
 void main(){
 	mat4 MVP = projection * view * model;
 	frag = (model  * vec4(vertex, 1)).xyz;
 	gl_Position = MVP * vec4(vertex,1.) ;
+	depthfragment = depthMatrix*model*vec4(vertex,1.) ;
 	Ntex = texture; 
 	tex = texture * 40.;
 	norm = normal ; 

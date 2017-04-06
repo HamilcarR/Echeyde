@@ -11,7 +11,9 @@ public:
 	bool isPerspectiveProjection(){ return isPerspective; }
 	float getZNear(){ return zNear;  }
 	void print_data(); 
+	virtual void setProjection(glm::mat4 projection, bool ISperspective){ isPerspective = ISperspective; m_projection = projection;  }
 	void setAim(glm::vec3 &aim){ m_aim = aim; }
+	static const glm::mat4 getBoundingBox( ViewCamera camera, float size_frustrum , float rear_bias); 
 	float getZFar(){ return zFar; }
 	glm::mat4 getViewMatrix();
 	glm::mat4 getProjectionMatrix();

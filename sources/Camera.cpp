@@ -35,7 +35,22 @@ ViewCamera::ViewCamera(float left, float width, float right, float height , floa
 }
 
 
+const glm::mat4 ViewCamera::getBoundingBox( ViewCamera camera , float frustrum_limit , float rear_bias){
+	if (camera.isPerspective == true)
+	{
+		const float left = camera.getPosition().x-rear_bias; 
+		const float right = camera.getPosition().x + frustrum_limit; 
+		const float top = camera.getPosition().z + frustrum_limit; 
+		const float bottom = camera.getPosition().z - frustrum_limit; 
+		return glm::ortho(left, right, bottom, top); 
+	}
+	else{
 
+	}
+
+
+
+}
 
 void ViewCamera::setPosition(vec3 &pos) {
 	m_position = pos;

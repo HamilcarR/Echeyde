@@ -15,8 +15,10 @@ public :
 	Transform getTransform(){ return transform; }
 	void isDisplayed(bool displayed); 
 	std::vector<Mesh*> getMeshes(){ return mesh_list; }
-
-
+	/*Set texture of one mesh*/
+	virtual void setTexture(unsigned int mesh, Texture texture, Echeyde::TEX tex_unit); 
+	/*Set texture for all meshes*/
+	virtual void setTexture(Texture texture, Echeyde::TEX tex_unit); 
 protected: 
 	std::vector<Mesh*> mesh_list;
 	Transform transform; 

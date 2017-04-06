@@ -17,8 +17,16 @@ Object::~Object(){
 }
 
 
+void Object::setTexture(Texture A, Echeyde::TEX texunit){
+	for (Mesh* mesh : mesh_list){
+		mesh->setTexture(A, texunit); 
+	}
+}
 
-
+void Object::setTexture(unsigned int mesh, Texture A, Echeyde::TEX texunit){
+	assert(mesh < mesh_list.size());
+	mesh_list[mesh]->setTexture(A, texunit); 
+}
 
 
 

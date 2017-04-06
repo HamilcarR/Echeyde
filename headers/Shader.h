@@ -42,7 +42,7 @@ public:
 	virtual void BindShader(); 
 	virtual void UnBindShader();
 	virtual void BindMaterials(float pow, float expo, bool textured) ; 
-	virtual void BindZParameters(bool isPerspective, float zNear, float zFar); 
+	virtual void BindZParameters(bool isPerspective, float zNear, float zFar , glm::mat4 depth); 
 protected:
 	void Init_uniforms(); 
 	void compile_shaders();
@@ -55,9 +55,10 @@ protected:
 	std::string fragment_shader_name;
 	std::string geometry_shader_name;
 	std::string tesselation_shader_name;
+	
 
 	GLuint programID; 
-	
+	GLuint depthMatrix_uni;
 	GLuint vertex_shader; 
 	GLuint fragment_shader;
 	GLuint geometry_shader;

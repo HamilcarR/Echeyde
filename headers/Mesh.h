@@ -19,8 +19,8 @@ public:
 	Mesh(const Mesh& A); 
 	virtual ~Mesh();
 	virtual void clean();
-	void display_static(glm::mat4 &projection_matrix,  glm::mat4 &view, Shader* shader); 
-	void display_dynamic(glm::mat4 &projection_matrix, glm::mat4 &view , Shader* shader);
+	void display_static(glm::mat4 &projection_matrix,  glm::mat4 &view, Shader* shader , GLenum cull); 
+	void display_dynamic(glm::mat4 &projection_matrix, glm::mat4 &view , Shader* shader , GLenum cull);
 	bool isTransparent() { return material->isTransparent(); }
 	bool isDisplayed() { return displayed; }
 	void setDisplayed(bool k){ displayed = k;  }

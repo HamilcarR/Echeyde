@@ -14,13 +14,17 @@ float zFar = Z_parameters.y ;
 }
 
 void main(){
-	if(isPerspective == 1){
-		 gl_FragDepth = linearize_Z(gl_FragCoord.z) ; 
+/*for visualising depth buffer */
+
+	/*if(isPerspective == 1){
+		 gl_FragDepth = linearize_Z(gl_FragCoord.z) ;				
 		 color = vec4(1.);
 		 
 		 } 
 	else{
 		gl_FragDepth = gl_FragCoord.z;
 		color = vec4(1.); 
-	}
+	}*/
+
+	color=vec4(1.);
 }

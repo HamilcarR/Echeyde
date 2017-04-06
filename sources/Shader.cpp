@@ -11,6 +11,8 @@ static const std::string M_MODEL = "model";
 static const std::string M_VIEW = "view";
 static const std::string Z_PARAMETERS = "Z_parameters"; 
 static const std::string PERSPECTIVE_TYPE = "isPerspective";
+static const std::string depthMatrix = "depthMatrix"; 
+
 void Shader::set_textures_uni(GLuint program){
 	using namespace Echeyde;
 	for (unsigned int i = 0; i < TEX_SIZE; i++)
@@ -31,6 +33,7 @@ void Shader::Init_uniforms(){
 	material_uni.specular_expo = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[1]); 
 	material_uni.specular_pow = glGetUniformLocation(getProgram(), shader_uniforms_specular_names[0]); 
 	material_uni.textured = glGetUniformLocation(getProgram(), "isTextured"); 
+	depthMatrix_uni = glGetUniformLocation(getProgram(), depthMatrix.c_str()); 
 }
 Shader::Shader() {
 	
@@ -252,9 +255,10 @@ bool Shader::operator==(const Shader A) const{
 
 /*****************************************************************************************************************************************/
 
-void Shader::BindZParameters(bool isPerspective, float zNear, float zFar){
+void Shader::BindZParameters(bool isPerspective, float zNear, float zFar , glm::mat4 depth){
 	glUniform1i(uniform_projection_type, (isPerspective == true) ? 1 : 0); 
 	glUniform2f(uniform_z_parameters, zNear, zFar); 
+	glUniformMatrix4fv(depthMatrix_uni, 1, GL_FALSE, glm::value_ptr(depth)); 
 }
 
 

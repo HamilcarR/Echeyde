@@ -113,17 +113,22 @@ void Renderer::addDynamicMeshes(std::vector<Mesh*> &A){
 /**************************************************************************************************************************************/
 
 /**************************************************************************************************************************************/
-void Renderer::renderDynamicMeshes(ViewCamera& camera){
-	auto lambda = [&](std::pair<Material*, std::vector<Mesh*>> &Elem){
-		Elem.first->Bind();
-		BaseShader* s =dynamic_cast<BaseShader*> (Elem.first->getShader());
-		s->BindLights();
-		s->BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar()); 
-		for (Mesh* mesh : Elem.second)
-			mesh->display_dynamic(camera.getProjectionMatrix(), camera.getViewMatrix() , s); 
-		Elem.first->Unbind();
-	};
+void Renderer::renderDynamicMeshes(ViewCamera& camera, ViewCamera shadowCam){
+	glm::mat4 depth = shadowCam.getProjectionMatrix()*shadowCam.getViewMatrix();
+		auto lambda = [&](std::pair<Material*, std::vector<Mesh*>> &Elem){
+			Elem.first->Bind();
+			BaseShader* s =dynamic_cast<BaseShader*> (Elem.first->getShader());
+			s->BindLights();
+			s->BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar(),depth);
+			for (Mesh* mesh : Elem.second)
+			mesh->display_dynamic(camera.getProjectionMatrix(), camera.getViewMatrix() , s , GL_BACK);
+			Elem.first->Unbind();
+			};
+			for_each(dynamic_mesh_list.begin(), dynamic_mesh_list.end(), lambda);
+
+	
 	for_each(dynamic_mesh_list.begin(), dynamic_mesh_list.end(), lambda);
+
 
 }
 /**************************************************************************************************************************************/
@@ -137,14 +142,15 @@ Mesh* Renderer::addStaticMesh(Mesh* A){
 /**************************************************************************************************************************************/
 
 
-void Renderer::renderStaticMeshes(ViewCamera& camera){
+void Renderer::renderStaticMeshes(ViewCamera& camera, ViewCamera shadowCam){
+	glm::mat4 depth = shadowCam.getProjectionMatrix() * shadowCam.getViewMatrix();
 	auto lambda = [&](std::pair<Material*, Mesh*> &Elem){
-		Elem.first->Bind();
-		BaseShader* s =dynamic_cast<BaseShader*> (Elem.first->getShader());
+		Elem.second->getMaterial()->Bind();
+		BaseShader* s =dynamic_cast<BaseShader*> (Elem.second->getMaterial()->getShader());
 		s->BindLights();
-		s->BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar()); 
-			Elem.second->display_static(camera.getProjectionMatrix(), camera.getViewMatrix() , s);
-		Elem.first->Unbind();
+		s->BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar(),depth); 
+			Elem.second->display_static(camera.getProjectionMatrix(), camera.getViewMatrix() , s , GL_BACK);
+		Elem.second->getMaterial()->Unbind();
 	};
 	for_each(static_mesh_list.begin(), static_mesh_list.end(), lambda);
 }
@@ -165,11 +171,11 @@ void Renderer::addStaticMeshes(std::vector<Mesh*> &A){
 /**************************************************************************************************************************************/
 
 
-void Renderer::renderAll(ViewCamera& camera , Skybox *skybox){
+void Renderer::renderAll(ViewCamera& camera , Skybox *skybox , ViewCamera cam){
 	
 	skybox->render(camera); 
-	renderStaticMeshes(camera);
-	renderDynamicMeshes(camera); 
+	renderStaticMeshes(camera , cam);
+	renderDynamicMeshes(camera,cam); 
 
 }
 
@@ -180,45 +186,37 @@ void Renderer::renderAll(ViewCamera& camera , Skybox *skybox){
 /**************************************************************************************************************************************/
 void Renderer::sort(){
 	sortDynamic(); 
-	sortStatic(); 
 	sortGUI(); 
 
 }
 /**************************************************************************************************************************************/
 
-
+//TODO fix problem here /
 void Renderer::sortDynamic( ){
+	Mesh* add = nullptr; 
 	std::list<Mesh*> temp_meshes; 
-	for (std::pair<Material* , std::vector<Mesh*>> &e : dynamic_mesh_list){
-		Material* material = e.first; 
-		std::vector<Mesh*>::iterator it = std::find_if(e.second.begin(), e.second.end(), [material](Mesh* M){
-			return !(*M->getMaterial() == *material); 
+	std::vector<std::pair<Material*, std::vector<Mesh*>>>::iterator *structure_iterator = nullptr; 
+	std::vector<std::pair<Material*, std::vector<Mesh*>>>::iterator *structure_iterator_deletion = nullptr; 
+	std::vector<Mesh*>::iterator *mesh_iterator = nullptr; 
+	for (std::vector<std::pair<Material*, std::vector<Mesh*>>>::iterator it1 = dynamic_mesh_list.begin(); it1 != dynamic_mesh_list.end(); it1++){
+		Material* material = (*it1).first;
+		std::vector<Mesh*>::iterator it = std::find_if((*it1).second.begin(), (*it1).second.end(), [material](Mesh* M){
+			return !(*M->getMaterial() == *material);
 		});
 
-		if (it != e.second.end()){
-			Mesh* temp = *it; 
-			e.second.erase(it); 
-			addDynamicMesh(temp); 
-
-			return;
+		if (it != (*it1).second.end()){
+			add = *it;
+			(*it1).second.erase(it);
+			addDynamicMesh(add); 
+			return; 
 		}
 	}
-
-	
-	 
 	
 	
 }
 
 void Renderer::sortStatic(){
-	for (auto &e : static_mesh_list){
-		Material* material = e.first; 
-		Mesh * mesh = e.second; 
-		if (!(*mesh->getMaterial() == *material)){
-			addStaticMesh(mesh); 
-			e.second = nullptr; 
-		}
-	}
+	
 	
 }
 
@@ -239,17 +237,16 @@ void Renderer::addGui(Mesh* M){
 void Renderer::renderShadowMap(ViewCamera& camera, Framebuffer& framebuffer , Shader* shader){
 	framebuffer.BindDepth(); 
 	shader->BindShader(); 
-	shader->BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar()); 
+	shader->BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar() , glm::mat4(1.)); 
 	for (std::pair<Material*, std::vector<Mesh*>> &e : dynamic_mesh_list){
 		for (Mesh* mesh : e.second)
-			mesh->display_dynamic(camera.getProjectionMatrix(), camera.getViewMatrix() , shader); 
+			mesh->display_dynamic(camera.getProjectionMatrix(), camera.getViewMatrix() , shader , GL_FRONT); 
 
 	}
 	for (std::pair<Material*, Mesh*> &e : static_mesh_list)
-		e.second->display_static(camera.getProjectionMatrix(), camera.getViewMatrix(), shader); 
+		e.second->display_static(camera.getProjectionMatrix(), camera.getViewMatrix(), shader,GL_BACK); 
 	shader->UnBindShader(); 
 	framebuffer.Unbind();
-
 
 
 }

@@ -123,7 +123,7 @@ void Skybox::render(ViewCamera& camera){
 	glDisable(GL_CULL_FACE);
 	Bind(); 
 	shader.BindMatrices(camera.getProjectionMatrix(), camera.getViewMatrix(), glm::mat4(1.)); 
-	shader.BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar());
+	shader.BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar() , glm::mat4(1.));
 	glBindVertexArray(vao);
 	{
 		glDrawElements(GL_TRIANGLES, indice.size(), GL_UNSIGNED_SHORT, 0); 
