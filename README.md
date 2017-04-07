@@ -10,7 +10,7 @@ Terrain generation using height map :
 
 Shadow mapping : 
 
-![shadow mapping] (https://cloud.githubusercontent.com/assets/18567118/24793172/53db7698-1b81-11e7-8c40-e1045a93bf90.png)
+![shadow mapping](https://cloud.githubusercontent.com/assets/18567118/24793172/53db7698-1b81-11e7-8c40-e1045a93bf90.png)
 
 ![shadow mapping](https://cloud.githubusercontent.com/assets/18567118/24738381/a16ee256-1a95-11e7-9594-284979c9a2d6.jpg)
 
