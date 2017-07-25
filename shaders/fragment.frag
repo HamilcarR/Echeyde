@@ -16,6 +16,7 @@ out vec4 color;
 
 struct SpotLightArray{
 	vec3 position;
+	vec3 direction; 
 	vec3 color;
 	vec3 attenuation;
 	float radius;
@@ -66,8 +67,46 @@ struct LightResult{
 
 
 
+/*not tested*/
+LightResult computeSpotLight(vec3 Inor){
+vec3 toEye =normalize((camPosition - fragPos)) ; 
+LightResult result;
+result.diffuse = vec3(0.); 
+result.specular = vec3(0.); 
+vec3 normalized_normals = Inor; 
+vec3 sum = vec3(0.); 
+float final_spec_pow = spec_power ; 
+for(int i = 0 ; i < spot_lights_size ; i++){
+		
+		vec3 attenuation = spotLights[i].attenuation;
+		float power = spotLights[i].power;
+		vec3 color = spotLights[i].color; 
+		float radius = spotLights[i].radius;
+		vec3 position = spotLights[i].position;
+		float radius = spotLights[i].radius ; 
+		float angle = spotLights[i].angle ; 
+		vec3 to_light = normalize( ( position - fragPos)); 
+		
+		
+		float angleFragment = acos(cos(dot(-to_light , normalize(direction) ))) ; 
+		if(angleFragment > angle){
+			power = 0 ; 
+			final_spec_pow = 0 ; 
+		}
+			
+		float dist = length((to_light));	
+		float attenuation_calculated = attenuation.x + attenuation.y*dist + attenuation.z*dist*dist;
+		float light_variation = max(dot( to_light,normalized_normals ) , 0.0 ) ;
 
+		vec3 reflected_light = reflect(-to_light,normalized_normals);
+		float specular_variation = max(dot(toEye , reflected_light) , 0. ) ; 
+		float spec_result = pow(specular_variation , spec_exponent) ; 
+		result.specular += final_spec_pow * spec_result * color;
+		result.diffuse += power * light_variation * color /attenuation_calculated;
 
+	}
+	return result ;
+}
 
 
 
