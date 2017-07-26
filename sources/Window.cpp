@@ -7,6 +7,7 @@
 #include "../headers/Terrain.h"
 #include "../headers/Skybox.h"
 #include "../headers/Framebuffer.h"
+#include "../headers/GUI.h"
 #include <SOIL\SOIL.h>
 
 Window::Window(const std::string name , Uint16 width , Uint16 height,KInputs &inputs , Echeyde::Scene &sc)
@@ -64,13 +65,15 @@ void Window::Loop() {
 	std::vector<object_data> si, sb ; 
 	SkyboxShader skybox_shader("skybox.vert", "skybox.frag");
 	Skybox skybox(SKYBOX_LOCATION + "test.dds", skybox_shader);
-	geometry_data terrain_geometry = TerrainGenerator::generateTerrain("heightmap.png");
+	terrain_data_struct terrain_geometry = TerrainGenerator::generateTerrain("heightmap.png");
 
-	//geometry_data terrain_geometry = TerrainGenerator::generateTerrain(900);
+	//geometry_data terrain_g = TerrainGenerator::generateTerrain(10);
+	//terrain_data_struct terrain_geometry;
+	//terrain_geometry.terrain_data = terrain_g; 
 	try {
 	st = Echeyde::FILEIO::Importer::load_model(std::string("cube.obj"),true);
     si = Echeyde::FILEIO::Importer::load_model(std::string("objects.obj"),false);
-	sb = Echeyde::FILEIO::Importer::load_model(std::string("house.obj"), false); 
+	sb = Echeyde::FILEIO::Importer::load_model(std::string("pit.obj"), false); 
 	}
 	catch (const File_not_found &e) {
 		std::cout << e.what() << std::endl;
@@ -86,19 +89,22 @@ void Window::Loop() {
 	LightArray *lights = LightArray::getInstance();
 	
 	Framebuffer framebuffer(WIDTH, HEIGHT);
-	Framebuffer shadowframebuffer(8102, 8102); 
+	Framebuffer shadowframebuffer(1024, 1024); 
 	Texture A ( shadowframebuffer.getDepthTexture() , "shadow"); 
 //	ViewCamera light_view(70.f, float(WIDTH / HEIGHT), 0.1f, 2000.f, glm::vec3(0, 1, 0));
 
 
 //	GameObject sun = GameObject(sb, shader, true, true);
 //	sun.scale(glm::vec3(10, 10, 10)); 
-	GameObject cube = GameObject(st, &gui, true, false);
+	GUI cube = GUI(st, &gui, true, false);
+	cube.translate(glm::vec3(0.6, 0.6 , 0.1));		
+	cube.scale(glm::vec3(0.3, 0.1, 0.3)); 
 	GameObject house = GameObject(sb, shader, true, false);
 	house.scale(glm::vec3(10, 10, 10));
 	GameObject objects = GameObject(si, shader, true, true);
 	
 	objects.setTexture(A, Echeyde::SHADOWMAP0); 
+	house.setTexture(A, Echeyde::SHADOWMAP0); 
 	objects.translate(glm::vec3(430, 1, 430));
 	cube.setTexture(A, Echeyde::DIFFUSE0);
 
@@ -106,7 +112,7 @@ void Window::Loop() {
 		material_data mat_data ;
 		object_data terrain_obj;
 		mat_data.transparency = false; 
-		terrain_obj.data = terrain_geometry;
+		terrain_obj.data = terrain_geometry.terrain_data;
 		mat_data.textures.diffuse = TEXTURES_LOCATION + "/ground" + "/dirt" + "/dirt_01.png";
 		mat_data.textures.opacity = TEXTURES_LOCATION + "/blendmaps" + "/blend.png";
 		mat_data.textures.normal = TEXTURES_LOCATION + "/ground" + "/gravel_01.png";
@@ -116,7 +122,7 @@ void Window::Loop() {
 		terrain_obj.material = mat_data; 
 		std::vector<object_data> ob; 
 		ob.push_back(terrain_obj); 
-		GameObject terrain = GameObject(ob, terrain_shader, true, true);
+		Terrain terrain = Terrain(ob, terrain_shader, true, true , terrain_geometry.collision_map);
 
 		terrain.setTexture(A, Echeyde::SHADOWMAP0);
 
@@ -129,12 +135,12 @@ void Window::Loop() {
 		
 
 	
-	/*	data.base.position = glm::vec3(10, 2, 3);
+		data.base.position = glm::vec3(10, 2, 3);
 		data.attenuation = glm::vec3(1, 10, 100);
 		data.radius = 100.f;
 		data.base.colour = glm::vec3(0.6, 0.4, 0.2);
 		data.base.power = 50.F;
-		lights->addLight(new PointLight(data.base, data.radius, data.attenuation));*/
+		lights->addLight(new PointLight(data.base, data.radius, data.attenuation));
 
 
 		data.base.position = glm::vec3(300 ,300, 300);
@@ -142,34 +148,34 @@ void Window::Loop() {
 		data.base.power = 0.2F;
 		lights->addLight(new DirectionalLight(data.base));
 		
-	/*	data.base.position = glm::vec3(300, 5, 400);
+		data.base.position = glm::vec3(300, 5, 400);
 		data.attenuation = glm::vec3(10, 100, 100);
 		data.radius = 100.f;
 		data.base.colour = glm::vec3(0.2, 0.3, 0.6);
 		data.base.power = 700.F;
 		lights->addLight(new PointLight(data.base, data.radius, data.attenuation));
 		
-		data.base.position = glm::vec3(301, 4, 201);
-		data.attenuation = glm::vec3(10, 100, 100);
+		data.base.position = glm::vec3(400, 10, 400);
+		data.attenuation = glm::vec3(1, 1, 10);
 		data.radius = 100.f;
-		data.base.colour = glm::vec3(0.6, 0.4, 0.3);
-		data.base.power = 700.F;
+		data.base.colour = glm::vec3(0.6, 0.1, 0.3);
+		data.base.power = 100.F;
 		lights->addLight(new PointLight(data.base, data.radius, data.attenuation));
-		*/
+		
 
 		
 		
-		cube.translate(glm::vec3(0.6, 0.6 , 0.1));
-		cube.rotate(90, glm::vec3(1, 0, 0)); 
-		cube.scale(glm::vec3(0.3, 0.1, 0.3)); 
-		
+			
 	Camera user_camera =  Camera(5.f, 5.f, glm::vec3(0, 1, 0), 120.f, float(17/9), 0.1f, 5000.f);
 	user_camera.setPosition(glm::vec3(500, 90, 300)); 
 	SDL_Event event; 
 	float i = 10 , j = 400 , k = 400 , pow = 50 , ro = 0.; 
 
 	while (loop) {
-	DirectionalLight *P = dynamic_cast<DirectionalLight*>(lights->getLightArray()[0]);
+		GLuint t1 = SDL_GetTicks(); 
+	SDL_GL_SwapWindow(window); 
+	
+	DirectionalLight *P = dynamic_cast<DirectionalLight*>(lights->getLightArray()[1]);
 		while (SDL_PollEvent(&event)) {
 			
 			if (event.type == SDL_QUIT)
@@ -195,33 +201,31 @@ void Window::Loop() {
 			if (event.key.keysym.sym == SDLK_f)
 				SOIL_save_screenshot("screenshot.bmp", SOIL_SAVE_TYPE_BMP, 0, 0, 1920, 1080); 
 			user_camera.Move(event);
-			user_camera.print_data(); 
+		//	user_camera.print_data(); 
+//			std::cout << "Height : " << terrain.getHeight(user_camera.getPosition().x, user_camera.getPosition().y)<< "\n"; 
 
 		}
 	
 
 		cube.isDisplayed(false);
-
+		house.translate(glm::vec3(j, terrain.getHeightCollisionMap(j , k), k)); 
 		glm::vec3 pos = user_camera.getPosition();
-		house.translate(glm::vec3(j, i, k)); 
 		objects.translate(glm::vec3(j+50, i, k+50));
 		ro += 0.1f; 
 		objects.rotate(ro, glm::vec3(0, 1, 0)); 
-		ViewCamera light_view(-300.f, 300.f, -300.f, 300.f, 0.1f, 5000.f,glm::vec3(0,1,0)); 
-		//light_view.setProjection(ViewCamera::getBoundingBox(user_camera , 200 , 20) , false); 
-		light_view.setPosition(P->getPosition()+pos, pos);
-	//sun.translate(light_view.getPosition()); 
-	//sun.isDisplayed(false); 
+		ViewCamera light_view(-200.f, 200.f, -200.f, 200.f, 1.f, 10000.f,glm::vec3(0,1,0)); 
+		light_view.setPosition((P->getPosition()+pos)-glm::vec3(50,50,50), pos);
 	renderer->renderShadowMap(light_view, shadowframebuffer, shadowShader); 
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 //	sun.isDisplayed(true); 
-	cube.isDisplayed(false); 
+	cube.isDisplayed(true); 
 	renderer->renderAll(user_camera, &skybox , light_view);
 
-	SDL_GL_SwapWindow(window); 
-	SDL_Delay(15);
+	GLuint t2 = SDL_GetTicks(); 
+	//std::cout << "time : " << t2 - t1 << std::endl; 
+	//SDL_Delay(15);
 	}
 	TextureArray::clean();
 	framebuffer.clean(); 

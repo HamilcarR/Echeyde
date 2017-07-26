@@ -33,6 +33,12 @@ private:
 	std::vector<std::pair<Material*, std::vector<Mesh*>>> dynamic_mesh_list;
 	std::vector<std::pair<Material*, std::vector<Mesh*>>> GUI_list;
 
+	/*new rendering way:*/
+	std::vector<Shader, std::vector<Mesh*>> shader_list; 
+	std::vector<TextureGroup, std::vector<Mesh*>> texture_list; 
+	std::vector<Material, std::vector<Mesh*>> material_list; 
+
+
 
 };
 

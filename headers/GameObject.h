@@ -7,6 +7,7 @@ class Object{
 public :
 	Object(); 
 	Object(std::vector<object_data> &list_mesh, Shader* s);
+
 	virtual ~Object(); 
 	virtual void translate(glm::vec3 &t);
 	virtual void rotate(float a, glm::vec3 rotation);
@@ -39,12 +40,11 @@ class GameObject
 public:
 	GameObject();
 	GameObject(std::vector<object_data> &list_mesh, Shader* s, bool displayed, bool isStatic);
-
 	virtual ~GameObject();
-	
+	bool isStatic(){ return m_isStatic;  }
 	void addTexture(std::string& file, std::string& name); 
 
 private:
-	
+	bool m_isStatic; 
 };
 

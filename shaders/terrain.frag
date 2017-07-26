@@ -104,17 +104,25 @@ LightResult computePointLights(vec3 Inor){
 	vec3 normalized_normals = Inor; 
 	vec3 sum = vec3(0.); 
 	for(int i = 0 ; i < point_lights_size ; i++){
-		
 		vec3 attenuation = pointLights[i].attenuation;
 		float power = pointLights[i].power;
 		vec3 color = pointLights[i].color; 
 		float radius = pointLights[i].radius;
 		vec3 position = pointLights[i].position;
+
+
 		vec3 to_light = normalize( ( position - fragPos)); 
 		float dist = length(to_light); 
+		if(dist>radius){
+			result.diffuse += 0 ; 
+		}
+		else{
+				
+			
 		float attenuation_calculated = attenuation.x + attenuation.y*dist + attenuation.z*dist*dist;
 		float light_variation = max(dot( to_light,normalized_normals ) , 0.0 ) ;
 		result.diffuse += power * light_variation * color /attenuation_calculated;
+		}
 
 	}
 	
@@ -155,11 +163,10 @@ void main(){
 	
 	
 	
-	if(s1.r >= NDC.z - 0.002)//D.shadow_bias[0]) 
+	if(s1.z >= NDC.z - 0.001)//D.shadow_bias[0]) 
 		color = blend()*(Plight+Dlight);
 	else
 		color = blend() * vec4(0.01) ;	
 	
-	//color = texture2D(shadowmap,nTex) ; 
 
 }

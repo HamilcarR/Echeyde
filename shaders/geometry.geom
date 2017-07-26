@@ -12,7 +12,9 @@ in vec3 fragLoc[];
 in vec3 camPos[];
 in mat3 TANGMAT[];
 in mat4 s_model[] ; 
+in vec4 depth[];
 
+out vec4 Idepth;
 out vec3 Icolor ;
 out vec2 Itex;
 out vec3 Inorm;
@@ -29,6 +31,7 @@ void main(){
 	Inorm = norm[0];
 	fragPos = fragLoc[0]; 
 	camPosition = camPos[0];
+	Idepth = depth[0]; 
 	tangmat = TANGMAT[0];
 	model = s_model[0];
     EmitVertex();
@@ -41,11 +44,13 @@ void main(){
 	camPosition = camPos[1];
 	tangmat = TANGMAT[1];
 	model = s_model[1];
+	Idepth = depth[1]; 
     EmitVertex();
 
 	gl_Position = gl_in[2].gl_Position ;
 	Itex = tex[2];
 	Icolor = col[2]; 
+	Idepth = depth[2]; 
 	Inorm = norm[2];
 	fragPos = fragLoc[2]; 
 	camPosition = camPos[2];

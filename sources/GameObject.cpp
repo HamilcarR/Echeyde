@@ -69,6 +69,7 @@ void Object::translate(glm::vec3 &t){
 
 /********************************************************************************************************************************************/
 GameObject::GameObject(std::vector<object_data> &list_mesh, Shader* s,bool displayed , bool isStatic):Object(list_mesh , s){
+	m_isStatic = isStatic; 
 	Renderer *instance = Renderer::getInstance(); 
 	for (object_data i : list_mesh) {
 		std::shared_ptr<Material> material = std::shared_ptr<Material>(new Material(dynamic_cast<BaseShader*>(s), i.material));
@@ -91,6 +92,12 @@ GameObject::GameObject(std::vector<object_data> &list_mesh, Shader* s,bool displ
 GameObject::GameObject() :Object()
 {
 }
+
+
+
+
+
+
 
 
 GameObject::~GameObject()

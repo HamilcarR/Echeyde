@@ -173,10 +173,10 @@ void Renderer::addStaticMeshes(std::vector<Mesh*> &A){
 
 void Renderer::renderAll(ViewCamera& camera , Skybox *skybox , ViewCamera cam){
 	
-	skybox->render(camera); 
+
 	renderStaticMeshes(camera , cam);
 	renderDynamicMeshes(camera,cam); 
-
+	skybox->render(camera); 
 }
 
 
@@ -240,7 +240,7 @@ void Renderer::renderShadowMap(ViewCamera& camera, Framebuffer& framebuffer , Sh
 	shader->BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar() , glm::mat4(1.)); 
 	for (std::pair<Material*, std::vector<Mesh*>> &e : dynamic_mesh_list){
 		for (Mesh* mesh : e.second)
-			mesh->display_dynamic(camera.getProjectionMatrix(), camera.getViewMatrix() , shader , GL_FRONT); 
+			mesh->display_dynamic(camera.getProjectionMatrix(), camera.getViewMatrix() , shader , GL_BACK); 
 
 	}
 	for (std::pair<Material*, Mesh*> &e : static_mesh_list)

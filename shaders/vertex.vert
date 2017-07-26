@@ -11,7 +11,7 @@ layout(location=5) in vec3 bitangent;
 uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view; 
-
+uniform mat4 depthMatrix ; 
 
 
 out vec3 col;
@@ -20,14 +20,16 @@ out vec3 fragLoc;
 out vec3 camPos;
 out vec3 norm;
 out mat3 TANGMAT;
- out mat4 s_model;
+out mat4 s_model;
+out vec4 depth ; 
 
 void main(){
 	mat4 MVP = projection*view*model;
 	mat4 MV = view*model;
 	s_model = model ; 
-	gl_Position = MVP*vec4(vertex,1.); 
-	col=color; 
+	gl_Position = MVP*vec4(vertex,1.);
+	depth = depthMatrix * model * vec4(vertex, 1.); 
+	col=color;  
 	tex=vec2(texture.x , texture.y) ;
 	vec3 nmapN = normalize((model * vec4(normal,1.)).xyz) ; 
 	norm = nmapN;

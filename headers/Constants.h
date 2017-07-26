@@ -34,8 +34,8 @@ const std::string HEIGHTMAPS_LOCATION = TEXTURES_LOCATION + "heightmaps/";
 const std::string SKYBOX_LOCATION = TEXTURES_LOCATION + "skybox/";
 /****************************************************************************************************************************************************************************/
 /*Constants*/
-const uint16_t WIDTH = 1920; 
-const uint16_t HEIGHT = 1080; 
+const uint16_t WIDTH = 900; 
+const uint16_t HEIGHT = 900; 
 const uint16_t EVENT_ARRAY_SIZE = 10; 
 const int vbo_size = 7; 
 

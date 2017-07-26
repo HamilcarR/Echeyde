@@ -1,9 +1,16 @@
 #pragma once
 #include "Mesh.h"
+#include "GameObject.h"
+struct terrain_data_struct{
+	geometry_data terrain_data; 
+	std::vector<std::vector<float>> collision_map; 
+
+};
+
 class TerrainGenerator{
 public:
 	/*async methods */
-	static geometry_data generateTerrain(const char* heightmap);
+	static terrain_data_struct generateTerrain(const char* heightmap);
 	static geometry_data generateTerrain(unsigned int size);
 
 
@@ -15,20 +22,22 @@ private:
 	/*generate a flat terrain*/
 	static geometry_data generate(unsigned int size);
 	/*using heightmap to generate terrain heights*/
-	static geometry_data generate(const char* file_heightmap);
+	static terrain_data_struct generate(const char* file_heightmap);
 };
-class Terrain : public Mesh
+class Terrain : public GameObject
 {
 public:
 	Terrain();
-	Terrain(geometry_data &data, std::shared_ptr<Material> &material, bool isdisplayed);
+	Terrain(std::vector<object_data> &list_mesh, Shader* s, bool displayed, bool isStatic , std::vector<std::vector<float>> collision);
 	virtual ~Terrain();
 
+	float getHeightCollisionMap(float x, float y);
 
 private:
-	
+
 
 protected:
 
+	std::vector<std::vector<float>> collision_map; 
 };
 
