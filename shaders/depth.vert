@@ -15,7 +15,7 @@ out vec4 position ;
 
 
 void main(){
-	mat4 MVP = projection*view*model;
+	mat4 MVP = projection*view*model; //TODO test avec view * model seulement
 	position = MVP * vec4(vertex,1.); 
 	gl_Position = position ;  	
 }
