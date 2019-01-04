@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SCENE_H
+#define SCENE_H
 #include "Mesh.h"
 namespace Echeyde {
 	class Scene
@@ -14,3 +15,4 @@ namespace Echeyde {
 
 
 }
+#endif

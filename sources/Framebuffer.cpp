@@ -1,5 +1,5 @@
-#include "..\headers\Framebuffer.h"
-#include "..\headers\Material.h"
+#include "../headers/Framebuffer.h"
+#include "../headers/Material.h"
 
 
 Framebuffer::Framebuffer()

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FRAMEBUFFER_H
+#define FRAMEBUFFER_H
 #include "Constants.h"
 #include "Texture.h"
 class Framebuffer
@@ -28,3 +29,4 @@ private:
 	unsigned W, H; 
 };
 
+#endif

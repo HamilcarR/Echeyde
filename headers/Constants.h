@@ -9,17 +9,17 @@
 #include <fstream>
 #include <regex>
 #include <memory>
-#include <glm\common.hpp>
-#include <glm\gtc\type_ptr.hpp>
-#include <glm\gtx\transform.hpp>
-#include <glm\gtx\rotate_vector.hpp>
+#include <glm/common.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/rotate_vector.hpp>
 #include <cinttypes>
 #include <thread>
 #include <future>
 #include <sstream>
 #include <map>
-#include <SDL\SDL.h>
-#include <GL\glew.h>
+#include <SDL2/SDL.h>
+#include <GL/glew.h>
 
 #include <vector>
 
@@ -29,13 +29,14 @@ class Texture;
 /*Paths*/
 const std::string SHADER_LOCATION = "shaders/";
 const std::string RESSOURCES_LOCATION = "res/";
+const std::string MESHES_LOCATION = RESSOURCES_LOCATION + "meshes/"; 
 const std::string TEXTURES_LOCATION = RESSOURCES_LOCATION + "textures/";
 const std::string HEIGHTMAPS_LOCATION = TEXTURES_LOCATION + "heightmaps/"; 
 const std::string SKYBOX_LOCATION = TEXTURES_LOCATION + "skybox/";
 /****************************************************************************************************************************************************************************/
 /*Constants*/
-const uint16_t WIDTH = 900; 
-const uint16_t HEIGHT = 900; 
+const uint16_t WIDTH = 1000; 
+const uint16_t HEIGHT = 1000; 
 const uint16_t EVENT_ARRAY_SIZE = 10; 
 const int vbo_size = 7; 
 
@@ -129,7 +130,7 @@ public:
 
 
 
-	void print(std::ofstream &file_o) {
+	void print(std::ofstream& file_o) {
 		int rap = 1;
 		file_o << "Vertices :\n";
 		for (float m : vertex) {
@@ -177,7 +178,7 @@ public:
 		}
 	}
 
-	void listing(std::string& file) {
+	void listing(std::string file) {
 		std::ofstream file_o(file.c_str());
 		std::string vertex_ok = (vertex.size() > 0) ? "Vertex array OK\n" : "No vertex data available\n";
 		std::string indices_ok = (indices.size() > 0) ? "Indices array OK\n" : "No indices data available\n";

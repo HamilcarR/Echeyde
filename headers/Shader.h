@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SHADER_H
+#define SHADER_H
 #include <iostream>
 #include <cstdlib>
 #include <string>
@@ -23,9 +24,9 @@ class Shader
 {
 public:
 	Shader();
-	Shader(std::string &vertex_shader, std::string& fragment_shader); 
-	Shader(std::string &vertex_shader,std::string &fragment_shader,std::string &geometry_shader,std::string &tesselation_shader);
-	Shader(std::string &vertex_shader, std::string& fragment_shader,std::string& geometry_shader);
+	Shader(std::string vertex_shader, std::string fragment_shader); 
+	Shader(std::string vertex_shader,std::string fragment_shader,std::string geometry_shader,std::string tesselation_shader);
+	Shader(std::string vertex_shader, std::string fragment_shader,std::string geometry_shader);
 	const GLuint getProgram() const { return programID;}
 	virtual ~Shader();
 	bool operator==(const Shader A) const;
@@ -34,7 +35,7 @@ public:
 	const std::string getGeometryShader()const{ return geometry_shader_name; }
 	const std::string getTesselationShader()const{ return tesselation_shader_name; }
 	virtual void clean();
-	virtual void BindMatrices(glm::mat4& projection, glm::mat4& view, glm::mat4& model) const;
+	virtual void BindMatrices(glm::mat4 projection, glm::mat4 view, glm::mat4 model) const;
 	virtual void BindTextures(Echeyde::TEX);
 	const GLuint getUniformProjection()const{ return uniform_projection; }
 	const GLuint getUniformView()const{ return uniform_view; }
@@ -105,9 +106,9 @@ class BaseShader :
 {
 public:
 	BaseShader();
-	BaseShader(std::string &vertex_shader, std::string &fragment_shader, std::string &geometry_shader);
-	BaseShader(std::string &vertex_shader, std::string &fragment_shader, std::string &geometry_shader, std::string &tesselation_shader);
-	BaseShader(std::string &vertex_shader, std::string &fragment_shader);
+	BaseShader(std::string vertex_shader, std::string fragment_shader, std::string geometry_shader);
+	BaseShader(std::string vertex_shader, std::string fragment_shader, std::string geometry_shader, std::string tesselation_shader);
+	BaseShader(std::string vertex_shader, std::string fragment_shader);
 	virtual ~BaseShader();
 	virtual void BindLights();
 	
@@ -123,3 +124,4 @@ private:
 
 	
 };
+#endif

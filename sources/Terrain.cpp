@@ -1,6 +1,6 @@
 #include "../headers/Terrain.h"
-#include <SOIL\SOIL.h>
-#include <SDL\SDL_image.h>
+#include <SOIL/SOIL.h>
+#include <SDL2/SDL_image.h>
 
 
 
@@ -185,7 +185,7 @@ Terrain::Terrain()
 {
 }
 
-Terrain::Terrain(std::vector<object_data> &list_mesh, Shader* s, bool displayed, bool isStatic , std::vector<std::vector<float>> collision)
+Terrain::Terrain(std::vector<object_data> list_mesh, Shader* s, bool displayed, bool isStatic , std::vector<std::vector<float>> collision)
 	:GameObject(list_mesh , s , displayed , isStatic) 
 
 {

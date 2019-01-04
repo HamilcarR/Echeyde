@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TERRAIN_H
+#define TERRAIN_H
 #include "Mesh.h"
 #include "GameObject.h"
 struct terrain_data_struct{
@@ -28,7 +29,7 @@ class Terrain : public GameObject
 {
 public:
 	Terrain();
-	Terrain(std::vector<object_data> &list_mesh, Shader* s, bool displayed, bool isStatic , std::vector<std::vector<float>> collision);
+	Terrain(std::vector<object_data> list_mesh, Shader* s, bool displayed, bool isStatic , std::vector<std::vector<float>> collision);
 	virtual ~Terrain();
 
 	float getHeightCollisionMap(float x, float y);
@@ -41,3 +42,4 @@ protected:
 	std::vector<std::vector<float>> collision_map; 
 };
 
+#endif

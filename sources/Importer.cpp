@@ -1,7 +1,7 @@
 #include "../headers/Importer.h"
-#include <assimp\scene.h>
-#include <assimp\Importer.hpp>
-#include <assimp\postprocess.h>
+#include <assimp/scene.h>
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 const int UV_CHANNEL = 0x0;
 
 namespace Echeyde {
@@ -15,7 +15,8 @@ namespace Echeyde {
 			aiReturn status = material->GetTexture(tex, index, &path, 0, 0, 0, 0, 0);
 			if (status == AI_SUCCESS)
 			{
-				std::string full_path = RESSOURCES_LOCATION + path.data;
+				std::string full_path =  path.data;
+				std::cout << "Loading Texture : " << full_path << "\n" ; 
 				return full_path;
 			}
 			else
@@ -120,12 +121,12 @@ namespace Echeyde {
 		
 /**********************************************************************************************************************************************/
 
-		std::vector<object_data> Importer::load_model(std::string& filename, bool transparency) {
+		std::vector<object_data> Importer::load_model(std::string filename, bool transparency) {
 			std::vector<object_data> data;
 			Assimp::Importer importer;
-			const aiScene *scene = importer.ReadFile(RESSOURCES_LOCATION+filename, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_JoinIdenticalVertices);
+			const aiScene *scene = importer.ReadFile(MESHES_LOCATION+filename, aiProcess_Triangulate | aiProcess_CalcTangentSpace | aiProcess_GenNormals | aiProcess_JoinIdenticalVertices);
 			if (scene == nullptr) {
-				throw Importer_Error(importer,filename);
+				std::cout << "Failed to Load model : " << filename << std::endl; 
 				return data; 
 			}
 			const aiMaterial* material;
@@ -146,7 +147,7 @@ namespace Echeyde {
 	
 	
 /**********************************************************************************************************************************************/
-		material_data Importer::getMaterial(std::string &file , bool transparency){
+		material_data Importer::getMaterial(std::string file , bool transparency){
 			std::vector<object_data> object;
 			try{
 				object = load_model(file,transparency);

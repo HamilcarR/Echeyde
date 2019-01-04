@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SKYBOX_H
+#define SKYBOX_H
 #include "Texture.h"
 #include "SkyboxShader.h"
 #include "Camera.h"
@@ -11,7 +12,7 @@ public:
 	virtual void Bind(); 
 	virtual void UnBind(); 
 	virtual void clean(); 
-	virtual void render(ViewCamera& camera); 
+	virtual void render(ViewCamera camera); 
 protected:
 	GLuint cubemapID; 
 	Transform transform; 
@@ -26,3 +27,4 @@ private:
 
 };
 
+#endif

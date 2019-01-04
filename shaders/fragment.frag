@@ -21,6 +21,7 @@ struct SpotLightArray{
 	vec3 attenuation;
 	float radius;
 	float power;
+	float angle;
 
 };
 
@@ -83,10 +84,9 @@ for(int i = 0 ; i < spot_lights_size ; i++){
 		vec3 color = spotLights[i].color; 
 		float radius = spotLights[i].radius;
 		vec3 position = spotLights[i].position;
-		float radius = spotLights[i].radius ; 
 		float angle = spotLights[i].angle ; 
 		vec3 to_light = normalize( ( position - fragPos)); 
-		
+		vec3 direction = spotLights[i].direction; 	
 		
 		float angleFragment = acos(cos(dot(-to_light , normalize(direction) ))) ; 
 		if(angleFragment > angle){
@@ -145,7 +145,7 @@ LightResult computePointLights(vec3 Inor){
 	LightResult result;
 	result.diffuse = vec3(0.); 
 	result.specular = vec3(0.); 
-	vec3 normalized_normals = Inor; 
+	vec3 normalized_normals = normalize(Inor); 
 	vec3 sum = vec3(0.); 
 	for(int i = 0 ; i < point_lights_size ; i++){
 		
@@ -175,16 +175,18 @@ LightResult computePointLights(vec3 Inor){
 
 void main(){
 if(isTextured == 1){
-	vec3 nmap_normales=tangmat*(normalize(2*texture2D(normal,Itex)-1)).rgb ;
-	LightResult P = computePointLights(nmap_normales) ; 
-	LightResult D = computeDirectionalLights(nmap_normales) ; 
+	vec3 nmap_normales=tangmat*(normalize(2*texture2D(normal,vec2(Itex.x , -Itex.y))-1)).rgb ;
+	
+	LightResult P = computePointLights(normalize(nmap_normales)) ; 
+
+	LightResult D = computeDirectionalLights(normalize(nmap_normales)) ; 
 
 	vec4 Plight = vec4(P.diffuse,0.);
 	vec4 Pspec = vec4(P.specular,0.); 
 	vec4 Dlight = vec4(D.diffuse,0.); 
 	vec4 Dspec = vec4(D.specular,0.);
 	
-	color = texture2D(diffuse,Itex)*(Plight+Dlight) + (Pspec+Dspec);
+	color = texture2D(diffuse,vec2(Itex.x , -Itex.y)) * ((Plight+Dlight) + (Pspec+Dspec) );
 	}
 	else{
 	vec3 nmap_normales = normalize(Inorm); 

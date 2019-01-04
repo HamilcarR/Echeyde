@@ -1,4 +1,5 @@
-#pragma once
+#ifndef KINPUTS_H
+#define KINPUTS_H
 /*Game loop class and events */
 #include "Constants.h"
 enum EVKEY : unsigned {Z = 0 , S = 1 , D = 2 , Q = 3 , K8 };
@@ -15,3 +16,4 @@ private:
 	SDL_Event event;
 };
 
+#endif

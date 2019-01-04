@@ -35,12 +35,9 @@ void Shader::Init_uniforms(){
 	material_uni.textured = glGetUniformLocation(getProgram(), "isTextured"); 
 	depthMatrix_uni = glGetUniformLocation(getProgram(), depthMatrix.c_str()); 
 }
-Shader::Shader() {
-	
 
-}
 
-Shader::Shader(std::string& v, std::string &f) {
+Shader::Shader(std::string v, std::string f) {
 	vertex_shader_name = SHADER_LOCATION + v;
 	fragment_shader_name = SHADER_LOCATION + f;
 	geometry_shader_name = " "; 
@@ -50,7 +47,7 @@ Shader::Shader(std::string& v, std::string &f) {
 	Init_uniforms(); 
 }
 
-Shader::Shader(std::string &v, std::string &f, std::string &g) {
+Shader::Shader(std::string v, std::string f, std::string g) {
 	vertex_shader_name = SHADER_LOCATION + v;
 	fragment_shader_name = SHADER_LOCATION + f;
 	geometry_shader_name = SHADER_LOCATION + g;
@@ -61,7 +58,7 @@ Shader::Shader(std::string &v, std::string &f, std::string &g) {
 }	
 
 
-Shader::Shader(std::string &v, std::string &f, std::string &g, std::string &t)
+Shader::Shader(std::string v, std::string f, std::string g, std::string t)
 {
 	vertex_shader_name = SHADER_LOCATION+v;
 	fragment_shader_name = SHADER_LOCATION + f;
@@ -70,6 +67,11 @@ Shader::Shader(std::string &v, std::string &f, std::string &g, std::string &t)
 	create_shaders(); 
 	compile_shaders(); 
 	Init_uniforms(); 
+
+
+}
+
+Shader::Shader(){
 
 
 }
@@ -262,7 +264,7 @@ void Shader::BindZParameters(bool isPerspective, float zNear, float zFar , glm::
 }
 
 
-void Shader::BindMatrices(glm::mat4 &proj, glm::mat4 &view, glm::mat4 &model) const{
+void Shader::BindMatrices(glm::mat4 proj, glm::mat4 view, glm::mat4 model) const{
 	glUniformMatrix4fv(uniform_projection, 1, GL_FALSE, glm::value_ptr(proj));
 	glUniformMatrix4fv(uniform_model, 1, GL_FALSE, glm::value_ptr(model));
 	glUniformMatrix4fv(uniform_view, 1, GL_FALSE, glm::value_ptr(view));
@@ -352,7 +354,7 @@ static uni_lights_array get_lights_uni(GLuint program){
 BaseShader::BaseShader(){
 
 }
-BaseShader::BaseShader(std::string &vertex_shader, std::string &fragment_shader) : Shader(vertex_shader, fragment_shader){
+BaseShader::BaseShader(std::string vertex_shader, std::string fragment_shader) : Shader(vertex_shader, fragment_shader){
 	uni_lights_array uni = get_lights_uni(getProgram()); 
 	SLight_uni = uni.SLight_uni;
 	DLight_uni = uni.DLight_uni;
@@ -364,7 +366,7 @@ BaseShader::BaseShader(std::string &vertex_shader, std::string &fragment_shader)
 
 
 }
-BaseShader::BaseShader(std::string &vertex_shader, std::string &fragment_shader, std::string &geometry_shader) : Shader(vertex_shader, fragment_shader, geometry_shader){
+BaseShader::BaseShader(std::string vertex_shader, std::string fragment_shader, std::string geometry_shader) : Shader(vertex_shader, fragment_shader, geometry_shader){
 	uni_lights_array uni = get_lights_uni(getProgram()); 
 	SLight_uni = uni.SLight_uni;
 	DLight_uni = uni.DLight_uni;

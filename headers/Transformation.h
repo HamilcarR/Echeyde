@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TRANSFORMATION_H
+#define TRANSFORMATION_H
 #include "Constants.h"
 
 class Transform{
@@ -66,3 +67,4 @@ protected :
 
 };
 
+#endif

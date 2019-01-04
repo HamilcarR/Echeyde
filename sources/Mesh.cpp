@@ -29,7 +29,7 @@ Mesh::Mesh(const Mesh& copy){
 	uniforms = copy.uniforms; 
 }
 
-Mesh::Mesh(geometry_data &data_arg , std::shared_ptr<Material> &mat , bool isdisplayed)
+Mesh::Mesh(geometry_data &data_arg , std::shared_ptr<Material> mat , bool isdisplayed)
 {
 	data = data_arg;
 	draw_mode = GL_STATIC_DRAW;
@@ -159,7 +159,7 @@ void Mesh::Unbind() {
 
 
 
-void Mesh::display_dynamic(glm::mat4 &projection, glm::mat4 &view , Shader* shader , GLenum culling) {
+void Mesh::display_dynamic(glm::mat4 projection, glm::mat4 view , Shader* shader , GLenum culling) {
 
 	if (displayed) {
 		if (isTransparent()){
@@ -198,7 +198,7 @@ void Mesh::display_dynamic(glm::mat4 &projection, glm::mat4 &view , Shader* shad
 }
 
 
-void Mesh::display_static(glm::mat4 &projection, glm::mat4 &view , Shader* shader , GLenum culling) {
+void Mesh::display_static(glm::mat4 projection, glm::mat4 view , Shader* shader , GLenum culling) {
 
 	if (displayed) {
 		if (isTransparent()){

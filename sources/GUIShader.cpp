@@ -1,4 +1,4 @@
-#include "..\headers\GUIShader.h"
+#include "../headers/GUIShader.h"
 
 
 GUIShader::GUIShader() :Shader()
@@ -6,7 +6,7 @@ GUIShader::GUIShader() :Shader()
 }
 
 
-GUIShader::GUIShader(std::string &v, std::string &g, std::string &f) 
+GUIShader::GUIShader(std::string v, std::string g, std::string f) 
 	:Shader(v , g , f)
 {
 

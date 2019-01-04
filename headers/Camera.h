@@ -1,18 +1,19 @@
-#pragma once
+#ifndef CAMERA_H
+#define CAMERA_H
 #include "Constants.h"
 
 class ViewCamera{
 public:
 	ViewCamera(float FOV, float ratio, float zNear, float zFar, glm::vec3 vertical);
 	ViewCamera(float left, float width, float right, float height, float zNear, float zFar, glm::vec3 vertical);
-	void setPosition(glm::vec3& position); 
-	void setPosition(glm::vec3& position, glm::vec3& aim); 
+	void setPosition(glm::vec3 position); 
+	void setPosition(glm::vec3 position, glm::vec3 aim); 
 	glm::vec3 getPosition() { return glm::vec3(m_position.x , m_position.y , m_position.z); }
 	bool isPerspectiveProjection(){ return isPerspective; }
 	float getZNear(){ return zNear;  }
 	void print_data(); 
 	virtual void setProjection(glm::mat4 projection, bool ISperspective){ isPerspective = ISperspective; m_projection = projection;  }
-	void setAim(glm::vec3 &aim){ m_aim = aim; }
+	void setAim(glm::vec3 aim){ m_aim = aim; }
 	static const glm::mat4 getBoundingBox( ViewCamera camera, float size_frustrum , float rear_bias); 
 	float getZFar(){ return zFar; }
 	glm::mat4 getViewMatrix();
@@ -61,3 +62,4 @@ private:
 
 
 };
+#endif

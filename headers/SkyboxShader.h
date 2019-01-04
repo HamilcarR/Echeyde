@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SKYBOXSHADER_H
+#define SKYBOXSHADER_H
 #include "Shader.h"
 class SkyboxShader : public Shader
 {
@@ -8,3 +9,4 @@ public:
 	virtual ~SkyboxShader();
 };
 
+#endif

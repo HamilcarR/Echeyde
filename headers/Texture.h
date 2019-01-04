@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TEXTURE_H
+#define TEXTURE_H
 #include "Constants.h"
 #include <unordered_map>
 #include "Shader.h"
@@ -7,21 +8,21 @@ class Texture
 {
 public:
 	Texture(); 
-	Texture(std::string &image);
+	Texture(std::string image);
 	Texture(GLuint id , std::string name); 
 	Texture(Texture &A); 
 	virtual ~Texture();
 	virtual void clean();
 	GLuint getTexture(); 
 	void setID(GLuint idd){ id = idd; }
-	void setName(std::string& name) { texture = name; }
+	void setName(std::string name) { texture = name; }
 	virtual void Bind(Echeyde::TEX texture_type, Shader* shader);
 	void Unbind(); 
 	bool isInitialized();
-	bool operator==(Texture &A) const;
-	void operator=(Texture &A) ; 
-	bool operator<(const Texture &A) const; 
-	const std::string& getTextureFile() const { return texture; }
+	bool operator==(Texture A) const;
+	void operator=(Texture A) ; 
+	bool operator<(const Texture A) const; 
+	const std::string getTextureFile() const { return texture; }
 private:
 	std::string texture;
 	GLuint id; 
@@ -32,7 +33,7 @@ private:
 class TextureGroup {
 public:
 	TextureGroup();
-	TextureGroup(material_data &data);
+	TextureGroup(material_data data);
 	TextureGroup(TextureGroup &A); 
 	virtual ~TextureGroup();
 	virtual void clean();
@@ -46,8 +47,8 @@ public:
 	const std::shared_ptr<Texture> getShadowmap_textures() const { return shadowmap_textures; }
 
 	void setTexture(Texture A, Echeyde::TEX type); 
-	bool operator==(TextureGroup &A) const;
-	bool operator<(const TextureGroup &A) const; 
+	bool operator==(TextureGroup A) const;
+	bool operator<(const TextureGroup A) const; 
 	void bindFirst(Shader* shader);
 	void unbind();
 	bool isInitialized();
@@ -86,9 +87,9 @@ public :
 	/*if texture_file doesn't exist in database,will create
 	*a new texture then return it...if it exists,return the existant texture
 	*/
-	std::shared_ptr<Texture> addOrReturn(std::string &texture_file , GLuint id);
+	std::shared_ptr<Texture> addOrReturn(std::string texture_file , GLuint id);
 	bool idUsed(unsigned int id);
-	bool isLoadedTexture(std::string &file); 
+	bool isLoadedTexture(std::string file); 
 	std::map<unsigned int , std::shared_ptr<Texture>> getArray() { return texture_array;  }
 	bool erase(GLuint id);
 protected:
@@ -99,3 +100,4 @@ protected:
 	~TextureArray(); 
 
 };
+#endif

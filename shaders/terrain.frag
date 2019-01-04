@@ -113,16 +113,16 @@ LightResult computePointLights(vec3 Inor){
 
 		vec3 to_light = normalize( ( position - fragPos)); 
 		float dist = length(to_light); 
-		if(dist>radius){
+	/*	if(dist>radius){
 			result.diffuse += 0 ; 
 		}
-		else{
+		else{*/
 				
 			
 		float attenuation_calculated = attenuation.x + attenuation.y*dist + attenuation.z*dist*dist;
 		float light_variation = max(dot( to_light,normalized_normals ) , 0.0 ) ;
-		result.diffuse += power * light_variation * color /attenuation_calculated;
-		}
+		result.diffuse += power * light_variation * color / attenuation_calculated;
+	//	}
 
 	}
 	
@@ -157,16 +157,9 @@ void main(){
 
 	vec3 NDC =   ((depthFragment.xyz/depthFragment.w)+1)/2 ;
 	vec4 s1 = texture2D(shadowmap , vec2(NDC.x,NDC.y)); 
-	
-	
-	
-	
-	
-	
 	if(s1.z >= NDC.z - 0.001)//D.shadow_bias[0]) 
 		color = blend()*(Plight+Dlight);
 	else
-		color = blend() * vec4(0.01) ;	
-	
+		color = blend() * (Plight+Dlight)*vec4(0.25) ;	
 
 }

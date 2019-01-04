@@ -52,11 +52,11 @@ const glm::mat4 ViewCamera::getBoundingBox( ViewCamera camera , float frustrum_l
 
 }
 
-void ViewCamera::setPosition(vec3 &pos) {
+void ViewCamera::setPosition(vec3 pos) {
 	m_position = pos;
 }
 
-void ViewCamera::setPosition(vec3 &pos, vec3 &aim){
+void ViewCamera::setPosition(vec3 pos, vec3 aim){
 	setPosition(pos); 
 	m_aim = aim;
 }

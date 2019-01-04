@@ -1,4 +1,5 @@
-#pragma once
+#ifndef IMPORTER_H
+#define IMPORTER_H
 #include "Constants.h"
 #include "File_not_found.h"
 #include "MaterialException.h"
@@ -9,9 +10,10 @@ namespace Echeyde {
 		class Importer
 		{
 		public:
-			static std::vector<object_data> load_model(std::string& file, bool transparency);
-			static material_data getMaterial(std::string& file , bool transparency); 
+			static std::vector<object_data> load_model(std::string file, bool transparency);
+			static material_data getMaterial(std::string file , bool transparency); 
 		};
 
 	}
 }
+#endif

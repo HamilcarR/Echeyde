@@ -37,7 +37,16 @@ Light::~Light(){
 
 }
 
+void Light::toString(){
+	glm::vec3 pos = transform.getPosition() ; 
+	std::cout << "Position : \n" ; 
+	std::cout << pos.x << "    " << pos.y << "      " << pos.z << "     " << "\n"; 
+	std::cout << "Power : \n " << power << "\n" ; 
+	
 
+
+
+}
 
 
 
@@ -67,6 +76,14 @@ shader_light_data PointLight::getLightInfo()  {
 	data.attenuation = attenuation;
 	data.radius = radius; 
 	return data; 
+}
+
+void PointLight::toString(){
+	Light::toString(); 
+	std::cout << "Attenuation: \n" << attenuation.x << "   " << attenuation.y << "   " << attenuation.z << "\n" 
+		<< "Radius; \n" << radius << "\n" ; 
+
+
 }
 /***************************************************************************************************************************************************/
 /*Directional Light class*/

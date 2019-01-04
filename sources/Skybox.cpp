@@ -1,6 +1,6 @@
-#include "..\headers\Skybox.h"
-#include <SOIL\SOIL.h>
-#include "..\headers\TextureException.h"
+#include "../headers/Skybox.h"
+#include <SOIL/SOIL.h>
+#include "../headers/TextureException.h"
 
 
 
@@ -53,8 +53,10 @@ const std::vector<unsigned short> indice = {// front
 const unsigned short SIZE = 2000; 
 Skybox::Skybox(std::string cubemap , SkyboxShader shade)
 {
+	std::cout << cubemap << std::endl; 
+	cubemapID = SOIL_load_OGL_single_cubemap(cubemap.c_str() ,SOIL_DDS_CUBEMAP_FACE_ORDER ,SOIL_LOAD_AUTO ,  SOIL_CREATE_NEW_ID , SOIL_FLAG_DDS_LOAD_DIRECT | SOIL_FLAG_MIPMAPS); 
 	
-	cubemapID = SOIL_load_OGL_single_cubemap(cubemap.c_str(), SOIL_DDS_CUBEMAP_FACE_ORDER, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_TEXTURE_REPEATS | SOIL_FLAG_MIPMAPS);
+//	cubemapID = SOIL_load_OGL_single_cubemap(cubemap.c_str() , "EWUDNS" , SOIL_LOAD_AUTO , SOIL_CREATE_NEW_ID , SOIL_FLAG_MIPMAPS); 
 	assert(cubemapID != 0); 
 	glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapID);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -119,7 +121,7 @@ void Skybox::UnBind(){
 }
 
 
-void Skybox::render(ViewCamera& camera){
+void Skybox::render(ViewCamera camera){
 	glDisable(GL_CULL_FACE);
 	Bind(); 
 	shader.BindMatrices(camera.getProjectionMatrix(), camera.getViewMatrix(), glm::mat4(1.)); 

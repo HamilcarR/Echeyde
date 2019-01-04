@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MATERIAL_H
+#define MATERIAL_H
 #include "Shader.h"
 #include "Texture.h"
 class Material
@@ -6,9 +7,9 @@ class Material
 public:
 	Material();
 	Material(Shader *shader);
-	Material(Shader *shader, TextureGroup& textures);
-	Material(Shader *shader, material_data& material_dat);
-	Material(Shader *shader, TextureGroup& textures, bool transparency);
+	Material(Shader *shader, TextureGroup &textures);
+	Material(Shader *shader, material_data &material_dat);
+	Material(Shader *shader, TextureGroup &textures, bool transparency);
 	Material( Material &A); 
 	virtual ~Material();
 	virtual void clean();
@@ -19,7 +20,7 @@ public:
 	bool isTextured() { return textures->isInitialized(); }
 	bool operator==( Material &A); 
 	bool operator<( Material &A) ;
-	Material& operator=(Material& A);
+	Material& operator=(Material &A);
 	std::shared_ptr<TextureGroup> getTextureGroup() const { return textures; }
 	Shader* getShader() const { return shader; }
 	float getSpecularExponent(){ return specular_exponent; }
@@ -42,3 +43,4 @@ private:
 
 };
 
+#endif

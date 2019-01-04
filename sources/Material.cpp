@@ -7,7 +7,7 @@ Material::Material() {
 }
 
 Material::Material(Material &A){
-	assert(shader != nullptr); 
+	//assert(shader != nullptr); 
 	shader = A.getShader(); 
 	textures = std::shared_ptr<TextureGroup>(new TextureGroup(*A.getTextureGroup())); 
 	ambient_color = A.ambient_color;

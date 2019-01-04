@@ -1,7 +1,7 @@
 #include "../headers/Renderer.h"
 #include "../headers/Skybox.h"
 #include <algorithm>
-
+#include <list> 
 Renderer* Renderer::instance = nullptr;
 /**************************************************************************************************************************************/
 Renderer* Renderer::getInstance(){
@@ -53,6 +53,8 @@ void Renderer::destroy(){
 
 Renderer::Renderer()
 {
+
+
 }
 /**************************************************************************************************************************************/
 
@@ -103,7 +105,7 @@ void Renderer::addDynamicMesh(Mesh* A){ // construct mesh from here
 
 }
 
-void Renderer::addDynamicMeshes(std::vector<Mesh*> &A){
+void Renderer::addDynamicMeshes(std::vector<Mesh*> A){
 	for (Mesh* m : A)
 		addDynamicMesh(m); 
 	
@@ -113,7 +115,7 @@ void Renderer::addDynamicMeshes(std::vector<Mesh*> &A){
 /**************************************************************************************************************************************/
 
 /**************************************************************************************************************************************/
-void Renderer::renderDynamicMeshes(ViewCamera& camera, ViewCamera shadowCam){
+void Renderer::renderDynamicMeshes(ViewCamera camera, ViewCamera shadowCam){
 	glm::mat4 depth = shadowCam.getProjectionMatrix()*shadowCam.getViewMatrix();
 		auto lambda = [&](std::pair<Material*, std::vector<Mesh*>> &Elem){
 			Elem.first->Bind();
@@ -142,7 +144,7 @@ Mesh* Renderer::addStaticMesh(Mesh* A){
 /**************************************************************************************************************************************/
 
 
-void Renderer::renderStaticMeshes(ViewCamera& camera, ViewCamera shadowCam){
+void Renderer::renderStaticMeshes(ViewCamera camera, ViewCamera shadowCam){
 	glm::mat4 depth = shadowCam.getProjectionMatrix() * shadowCam.getViewMatrix();
 	auto lambda = [&](std::pair<Material*, Mesh*> &Elem){
 		Elem.second->getMaterial()->Bind();
@@ -158,7 +160,7 @@ void Renderer::renderStaticMeshes(ViewCamera& camera, ViewCamera shadowCam){
 /**************************************************************************************************************************************/
 
 
-void Renderer::addStaticMeshes(std::vector<Mesh*> &A){
+void Renderer::addStaticMeshes(std::vector<Mesh*> A){
 	for (Mesh* m : A)
 		addStaticMesh(m);
 
@@ -171,7 +173,7 @@ void Renderer::addStaticMeshes(std::vector<Mesh*> &A){
 /**************************************************************************************************************************************/
 
 
-void Renderer::renderAll(ViewCamera& camera , Skybox *skybox , ViewCamera cam){
+void Renderer::renderAll(ViewCamera camera , Skybox *skybox , ViewCamera cam){
 	
 
 	renderStaticMeshes(camera , cam);
@@ -225,7 +227,7 @@ void Renderer::sortGUI(){
 }
 
 
-void Renderer::addGui(std::vector<Mesh*> &mesh){
+void Renderer::addGui(std::vector<Mesh*> mesh){
 
 }
 
@@ -234,7 +236,7 @@ void Renderer::addGui(Mesh* M){
 }
 
 
-void Renderer::renderShadowMap(ViewCamera& camera, Framebuffer& framebuffer , Shader* shader){
+void Renderer::renderShadowMap(ViewCamera camera, Framebuffer framebuffer , Shader* shader){
 	framebuffer.BindDepth(); 
 	shader->BindShader(); 
 	shader->BindZParameters(camera.isPerspectiveProjection(), camera.getZNear(), camera.getZFar() , glm::mat4(1.)); 

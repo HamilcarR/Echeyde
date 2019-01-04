@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MESH_H
+#define MESH_H
 #include "Material.h"
 
 
@@ -15,12 +16,12 @@ public:
 	 void merge( Mesh &B);
 	
 	Mesh();
-	Mesh(geometry_data &data , std::shared_ptr<Material> &material,bool isdisplayed);
-	Mesh(const Mesh& A); 
+	Mesh(geometry_data &data , std::shared_ptr<Material> material,bool isdisplayed);
+	Mesh(const Mesh &A); 
 	virtual ~Mesh();
 	virtual void clean();
-	void display_static(glm::mat4 &projection_matrix,  glm::mat4 &view, Shader* shader , GLenum cull); 
-	void display_dynamic(glm::mat4 &projection_matrix, glm::mat4 &view , Shader* shader , GLenum cull);
+	void display_static(glm::mat4 projection_matrix,  glm::mat4 view, Shader* shader , GLenum cull); 
+	void display_dynamic(glm::mat4 projection_matrix, glm::mat4 view , Shader* shader , GLenum cull);
 	bool isTransparent() { return material->isTransparent(); }
 	bool isDisplayed() { return displayed; }
 	void setDisplayed(bool k){ displayed = k;  }
@@ -49,3 +50,4 @@ private:
 	
 };
 
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FILE_NOT_FOUND_H
+#define FILE_NOT_FOUND_H
 #include "Constants.h"
 class File_not_found :
 	public std::runtime_error
@@ -13,3 +14,4 @@ public:
 private:
 };
 
+#endif

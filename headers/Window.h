@@ -14,7 +14,7 @@ struct Dim {
 class Window {
 
 public:
-	Window(const std::string name , Uint16 width , Uint16 height , KInputs &inputs , Echeyde::Scene &scene);
+	Window(const std::string name , Uint16 width , Uint16 height , KInputs inputs , Echeyde::Scene scene);
 	virtual ~Window(); 
 	Dim getDimensions();
 	void Loop(); 

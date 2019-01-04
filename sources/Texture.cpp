@@ -1,5 +1,5 @@
 #include "../headers/Texture.h"
-#include <SOIL\SOIL.h>
+#include <SOIL/SOIL.h>
 #include <assert.h>
 #include "../headers/TextureException.h"
 
@@ -26,7 +26,7 @@ Texture::Texture(unsigned int idd, std::string name){
 }
 
 
-Texture::Texture(std::string& filename)
+Texture::Texture(std::string filename)
 {
 
 		glGenTextures(1, &id);
@@ -93,21 +93,21 @@ bool Texture::isInitialized() {
 }
 
 /************************************************************************************/
-bool Texture::operator==(Texture& A) const{
+bool Texture::operator==(Texture A) const{
 	if (texture.compare(A.getTextureFile()) == 0)
 		return true;
 	else
 		return false; 
 }
 
-bool Texture::operator<(const Texture &A) const{
+bool Texture::operator<(const Texture A) const{
 	if (texture < A.getTextureFile())
 		return true;
 	else
 		return false;
 }
 
-void Texture::operator=(Texture &A)  {
+void Texture::operator=(Texture A)  {
 	id = A.getTexture(); 
 	texture = A.getTextureFile(); 
 }
@@ -137,7 +137,7 @@ TextureGroup::TextureGroup(TextureGroup &A){
 
 
 /************************************************************************************/
-TextureGroup::TextureGroup(material_data& mat) {
+TextureGroup::TextureGroup(material_data mat) {
 	TextureArray *instance = TextureArray::getUniqueInstance(); 
 	diffuse_textures = std::shared_ptr<Texture>(new Texture());
 	normal_textures = std::shared_ptr<Texture>(new Texture());
@@ -200,7 +200,7 @@ bool TextureGroup::isInitialized() {/*check null*/
 	}
 }
 
-bool TextureGroup::operator<(const TextureGroup &A) const{
+bool TextureGroup::operator<(const TextureGroup A) const{
 	bool diffuse = diffuse_textures < A.getDiffuse_textures();
 	bool normal = normal_textures < A.getNormal_textures(); 
 	bool opacity = opacity_textures < A.getOpacity_textures(); 
@@ -213,7 +213,7 @@ bool TextureGroup::operator<(const TextureGroup &A) const{
 }
 /************************************************************************************/
 
-bool TextureGroup::operator==(TextureGroup &A) const{
+bool TextureGroup::operator==(TextureGroup A) const{
 	if (*blend_textures == *A.getBlend_textures() 
 		&& *diffuse_textures == *A.getDiffuse_textures() 
 		&& *normal_textures == *A.getNormal_textures()
@@ -260,7 +260,7 @@ void TextureGroup::bindFirst(Shader* shader) {
 
 void TextureGroup::setTexture(Texture B, Echeyde::TEX type){
 	TextureArray* texArray = TextureArray::getUniqueInstance(); 
-	Texture A = *texArray->addOrReturn(const_cast<std::string&>(B.getTextureFile()), B.getTexture());
+	Texture A = *texArray->addOrReturn(B.getTextureFile(), B.getTexture());
 	switch (type){
 	case Echeyde::DIFFUSE0 : 
 		setDiffuse_textures(A);
@@ -351,7 +351,7 @@ TextureArray::~TextureArray() {
 }
 /************************************************************************************/
 
-std::shared_ptr<Texture> TextureArray::addOrReturn(std::string& file , GLuint id) {
+std::shared_ptr<Texture> TextureArray::addOrReturn(std::string file , GLuint id) {
 	for (const std::pair<unsigned int, std::shared_ptr<Texture>> &P : texture_array) {
 		if (P.second->getTextureFile().compare(file) == 0)
 			return P.second;
@@ -394,7 +394,7 @@ bool TextureArray::idUsed(unsigned int id) {
 }
 /************************************************************************************/
 
-bool TextureArray::isLoadedTexture(std::string& filename) {
+bool TextureArray::isLoadedTexture(std::string filename) {
 	for (const std::pair<unsigned int, std::shared_ptr<Texture>> &P : texture_array) {
 		if (P.second->getTextureFile().compare(filename) == 0)
 			return true;

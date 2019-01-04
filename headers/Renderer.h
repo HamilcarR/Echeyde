@@ -1,4 +1,5 @@
-#pragma once
+#ifndef RENDERER_H
+#define RENDERER_H
 #include "Mesh.h"
 #include "Skybox.h"
 #include "Framebuffer.h"
@@ -10,17 +11,17 @@ public:
 	 static Renderer* getInstance(); 
 	 void destroy(); 
 	 void addDynamicMesh(Mesh* M); 
-	 void addDynamicMeshes(std::vector<Mesh*> &meshes);
+	 void addDynamicMeshes(std::vector<Mesh*> meshes);
 	 Mesh* addStaticMesh(Mesh* mesh);
-	 void addStaticMeshes(std::vector<Mesh*> &meshes);
-	 void addGui(std::vector<Mesh*> &meshes);
+	 void addStaticMeshes(std::vector<Mesh*> meshes);
+	 void addGui(std::vector<Mesh*> meshes);
 	 void addGui(Mesh* M); 
-	 void renderAll(ViewCamera& camera ,  Skybox *skybox , ViewCamera shadowCam);
-	 void renderStaticMeshes(ViewCamera& camera, ViewCamera shadowCam);
-	 void renderDynamicMeshes(ViewCamera& camera, ViewCamera shadowCam); 
+	 void renderAll(ViewCamera camera ,  Skybox *skybox , ViewCamera shadowCam);
+	 void renderStaticMeshes(ViewCamera camera, ViewCamera shadowCam);
+	 void renderDynamicMeshes(ViewCamera camera, ViewCamera shadowCam); 
 	 void destroyPointersOnlyDynamic(); 
 	 void destroyPointersOnlyStatic(); 
-	 void renderShadowMap(ViewCamera& camera , Framebuffer& framebuffer  , Shader* shader); 
+	 void renderShadowMap(ViewCamera camera , Framebuffer framebuffer  , Shader* shader); 
 	 void sortDynamic(); 
 	 void sortStatic(); 
 	 void sortGUI();
@@ -34,11 +35,12 @@ private:
 	std::vector<std::pair<Material*, std::vector<Mesh*>>> GUI_list;
 
 	/*new rendering way:*/
-	std::vector<Shader, std::vector<Mesh*>> shader_list; 
-	std::vector<TextureGroup, std::vector<Mesh*>> texture_list; 
-	std::vector<Material, std::vector<Mesh*>> material_list; 
+//	std::vector<std::pair<Shader, std::vector<Mesh*>>> shader_list; 
+//	std::vector<std::pair<TextureGroup, std::vector<Mesh*>>> texture_list; 
+//	std::vector<std::pair<Material, std::vector<Mesh*>>> material_list; 
 
 
 
 };
 
+#endif

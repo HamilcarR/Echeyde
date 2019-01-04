@@ -30,7 +30,7 @@ void Object::setTexture(unsigned int mesh, Texture A, Echeyde::TEX texunit){
 
 
 
-void Object::translate(glm::vec3 &t){
+void Object::translate(glm::vec3 t){
 	 transform.translate(t); 
 	 for (Mesh* m : mesh_list){
 		 m->getTransform()->translate(t);
@@ -63,7 +63,11 @@ void Object::translate(glm::vec3 &t){
  }
 
 
+void Object::onTerrain(float x , float z , geometry_data terrain) {
+	
 
+
+}
 
 
 
